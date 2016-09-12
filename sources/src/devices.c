@@ -114,7 +114,9 @@ void devices_vsync_pre(void)
 	inputdevice_vsync ();
 	filesys_vsync ();
 	sampler_vsync ();
+#ifndef __LIBRETRO__
 	clipboard_vsync ();
+#endif /*__LIBRETRO__*/
 #ifdef RETROPLATFORM
 	rp_vsync ();
 #endif

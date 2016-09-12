@@ -236,6 +236,7 @@ int fs_emu_hud_handle_chat_input(fs_emu_event *event) {
 
 #define MAX_VISIBLE_LINES 12
 
+#ifndef __LIBRETRO__
 void fs_emu_hud_render_chat() {
     GList *link;
     int k;
@@ -373,3 +374,4 @@ void fs_emu_hud_render_chat() {
     }
     fs_mutex_unlock(g_console_mutex);
 }
+#endif /*__LIBRETRO__*/

@@ -11,7 +11,6 @@
 #include "options.h"
 #include "autoconf.h"
 #include "blkdev.h"
-#include "clipboard.h"
 #include "custom.h"
 #include "keyboard.h"
 #include "inputdevice.h"
@@ -140,7 +139,6 @@ int amiga_init(void)
     printf("UAE: Initializing core derived from %s\n", UAE_BASE_VERSION);
     write_log("UAE: Initializing core derived from %s\n", UAE_BASE_VERSION);
 
-    uae_register_main_thread();
     uae_time_init();
 
     /*
@@ -158,7 +156,7 @@ int amiga_init(void)
     filesys_host_init();
 
     romlist_init();
-    clipboard_init();
+
     return 1;
 }
 
@@ -307,10 +305,9 @@ int amiga_get_state_checksum_and_dump(void *data, int size)
     return checksum & 0x00ffffff;
 }
 
-void amiga_main(void)
-{
+//int amiga_main(int argc, char** argv) {
+void amiga_main() {
     write_log("amiga_main\n");
-    uae_register_emulation_thread();
 
     keyboard_settrans();
 
