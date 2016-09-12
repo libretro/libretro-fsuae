@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([FS-UAE], [2.7.14dev],
+AC_INIT([FS-UAE], [2.7.15dev],
         [frode@fs-uae.net], [fs-uae], [http://fs-uae.net])
 AC_CONFIG_AUX_DIR([.])
 AC_CANONICAL_HOST
@@ -295,6 +295,9 @@ AS_CASE([$host_os],
     OS_NAME="macosx"
     OS_NAME_2="Mac OS X"
     OS_NAME_3="OSX"
+    # OS_NAME="macos"
+    # OS_NAME_2="MacOS"
+    # OS_NAME_3="MacOS"
     OS_CPPFLAGS="-DMACOSX"
     LOADABLE_MODULE_EXT=".so"
     OS_LDFLAGS="-headerpad_max_install_names -pagezero_size 0x2000 -rpath @executable_path/../Frameworks"

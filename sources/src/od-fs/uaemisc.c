@@ -4,7 +4,6 @@
 #include "options.h"
 #include "newcpu.h"
 #include "autoconf.h"
-#include "clipboard.h"
 #include "fsdb.h"
 #include "options.h"
 #include "serial.h"
@@ -178,11 +177,6 @@ bool my_isfilehidden (const TCHAR *path) {
 
 void my_setfilehidden (const TCHAR *path, bool hidden) {
     STUB("path=\"%s\" hidden=%d", path, hidden);
-}
-
-int amiga_clipboard_want_data (void) {
-    STUB("");
-    return 0;
 }
 
 int target_get_volume_name (struct uaedev_mount_info *mtinf,
