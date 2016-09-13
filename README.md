@@ -17,11 +17,11 @@ Misc Issues:
 * Static Makefile (Will target mainly Linux x86_64/i686/arm)
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-*Test
- -The kickstart must be located here: (Retro_Save_Directory)/fsuae/Kickstarts
- -Using USE_FSUAEDIRS=1 at the make level, the software will use the same directories/configurations as the regular FS-UAE (kickstart: ~/FS-UAE/Kickstarts)
- -This software handle the 'fs-uae' configuration files
- -Your ADF file: /storage/df0.adf
+#Test
+* The kickstart must be located here: (Retro_Save_Directory)/fsuae/Kickstarts
+* Using USE_FSUAEDIRS=1 at the make level, the software will use the same directories/configurations as the regular FS-UAE (kickstart: ~/FS-UAE/Kickstarts)
+* This software handle the 'fs-uae' configuration files
+* Your ADF file: /storage/df0.adf
 
 ```bash
 cat >a500.fs-uae <<EOF
