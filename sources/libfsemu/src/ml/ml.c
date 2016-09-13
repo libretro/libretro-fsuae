@@ -221,7 +221,9 @@ void fs_ml_init()
 
 void fs_ml_init_2(void)
 {
+#ifndef __LIBRETRO__
     fs_ml_input_init();
+#endif /*__LIBRETRO__*/
 
     g_fs_ml_video_screenshot_mutex = fs_mutex_create();
 }

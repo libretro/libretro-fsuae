@@ -349,11 +349,10 @@ static void on_init() //  src/fs-uae/main.c: static void on_init()
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-
 char *g_fs_uae_disk_file_path = NULL;
 static int g_warn_about_missing_config_file;
-
-
+/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 static void retro_wrap_emulator(void)
 {
 #ifdef LIBRETRO_FSUAE
@@ -410,6 +409,18 @@ static void retro_wrap_emulator(void)
    
    // must be called early, before fs_emu_init -affects video output
    fs_uae_configure_amiga_model();
+   fs_uae_state_dir();
+
+   fs_emu_init_2(FS_EMU_INIT_EVERYTHING);
+
+   int deterministic_mode = 0;
+   if (fs_emu_netplay_enabled() ||
+       fs_config_get_boolean(OPTION_DETERMINISTIC) == 1) {
+     deterministic_mode = 1;
+   }
+   if (deterministic_mode) {
+     amiga_set_deterministic_mode();
+   }
 
 #if 0
    amiga_set_audio_callback(audio_callback_function);
@@ -437,6 +448,10 @@ static void retro_wrap_emulator(void)
    amiga_add_rtg_resolution(672, 540);
    amiga_add_rtg_resolution(960, 540);
    amiga_add_rtg_resolution(retrow, retroh);
+   //fs_uae_init_video();
+   fs_uae_init_mouse();
+   //fs_emu_run(main_function);
+   //cleanup_old_files();
    
    if (/*fs_emu_netplay_enabled()*/ 0) {
      fs_log("netplay is enabled\n");

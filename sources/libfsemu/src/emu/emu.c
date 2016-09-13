@@ -319,6 +319,7 @@ void fs_emu_init_2(int options) {
     fs_emu_netplay_init();
 #endif
 
+#ifndef __LIBRETRO__
 #ifdef FS_EMU_DRIVERS
     fs_emu_video_init();
 #else
@@ -328,13 +329,16 @@ void fs_emu_init_2(int options) {
 
     fs_emu_init_render();
 #endif
+#endif /*__LIBRETRO__*/
 
     // these must (currently) be called after renderer has been initialized,
     // due to a mutex that must be initialized first
+#ifndef __LIBRETRO__
     fs_emu_set_overlay_state(FS_EMU_TOP_LEFT_OVERLAY, 1);
     fs_emu_set_overlay_state(FS_EMU_TOP_RIGHT_OVERLAY, 1);
     fs_emu_set_overlay_state(FS_EMU_BOTTOM_RIGHT_OVERLAY, 1);
     fs_emu_set_overlay_state(FS_EMU_BOTTOM_LEFT_OVERLAY, 1);
+#endif /*__LIBRETRO__*/
 
 // #ifdef FS_EMU_DRIVERS_XXX
 // #else
@@ -352,9 +356,11 @@ void fs_emu_init_2(int options) {
         fs_emu_input_init_2();
 #endif
     }
+#ifndef __LIBRETRO__
     if (options & FS_EMU_INIT_AUDIO) {
         fs_emu_audio_init();
     }
+#endif /*__LIBRETRO__*/
 
 #ifdef FS_EMU_DRIVERS
 
@@ -363,8 +369,9 @@ void fs_emu_init_2(int options) {
     fs_ml_video_set_update_function(fs_emu_video_update_function);
     fs_ml_video_set_render_function(fs_emu_video_render_function);
     fs_ml_video_set_post_render_function(fs_emu_video_after_update);
-#endif
+#endif /*__LIBRETRO__*/
 
+#ifndef __LIBRETRO__
     if (options & FS_EMU_INIT_VIDEO) {
         char *title;
         if (fs_emu_get_title()) {
@@ -383,6 +390,7 @@ void fs_emu_init_2(int options) {
         fs_ml_video_create_window(title);
         free(title);
     }
+#endif /*__LIBRETRO__*/
 #endif
 }
 
@@ -463,11 +471,15 @@ int fs_emu_run(fs_emu_main_function function) {
         // FIXME: FATAL
     }
 
+#ifndef __LIBRETRO__
 #ifdef FS_EMU_DRIVERS
     int result = fs_emu_main_loop();
 #else
     int result = fs_ml_main_loop();
 #endif
+#else
+    int result = 0;
+#endif /*__LIBRETRO__*/
     fs_emu_log("fs_emu_run: main loop is done\n");
 
     if (g_fs_emu_benchmark_start_time) {

@@ -200,7 +200,7 @@ SOURCES_C +=			 $(ODFS)/hardfile_host.c \
 
 SOURCES_C +=			 $(LIBFSEMU)/thread.c $(LIBFSEMU)/filesys.c $(LIBFSEMU)/base.c $(LIBFSEMU)/data.c $(LIBFSEMU)/conf.c $(LIBFSEMU)/log.c $(LIBFSEMU)/inifile.c $(LIBFSEMU)/emu/video.c \
 	  			 $(LIBFSEMU)/emu/audio_common.c $(LIBFSEMU)/emu/audio_openal.c $(LIBFSEMU)/emu/emu.c $(LIBFSEMU)/emu/hud.c $(LIBFSEMU)/emu/input.c $(LIBFSEMU)/emu/keynames.c \
-				 $(LIBFSEMU)/ml/ml.c $(LIBFSEMU)/init.c $(LIBFSEMU)/path.c $(LIBFSEMU)/emu/theme.c $(LIBFSEMU)/time.c $(LIBFSEMU)/emu/netplay.c
+				 $(LIBFSEMU)/ml/ml.c $(LIBFSEMU)/init.c $(LIBFSEMU)/path.c $(LIBFSEMU)/emu/theme.c $(LIBFSEMU)/time.c $(LIBFSEMU)/emu/netplay.c $(LIBFSEMU)/emu/video_options.c $(LIBFSEMU)/ml/windows.c
 
 SOURCES_C += $(ODWIN32)/serial_win32.c $(ODWIN32)/picasso96_win.c
 SOURCES_C += $(QEMUVGA)/es1370.c $(QEMUVGA)/ne2000.c

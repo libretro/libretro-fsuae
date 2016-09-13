@@ -1884,5 +1884,7 @@ void fs_emu_input_init(void)
 
     initialize_modifier_key();
     initialize_devices_for_menu();
+#ifndef __LIBRETRO__
     fs_ml_set_input_function(input_function);
+#endif /*__LIBRETRO__*/
 }
