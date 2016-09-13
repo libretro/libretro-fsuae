@@ -1,3 +1,5 @@
+#include "libretro.h"
+
 const char* fs_uae_base_dir(void);
 const char *fs_uae_plugins_dir(void);
 const char *fs_uae_data_dir(void);
@@ -12,3 +14,4 @@ struct multipath {
 };
 
 extern struct multipath g_paths[5];
+extern retro_environment_t environ_cb;

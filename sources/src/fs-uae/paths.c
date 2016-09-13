@@ -249,8 +249,7 @@ const char *fs_uae_kickstarts_dir()
 {
     static const char *path;
     if (!path) {
-        path = create_default_dir("Kickstarts", "kickstarts_dir", "roms_dir",
-                "kickstarts-dir");
+        environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &path);
     }
     return path;
 }
