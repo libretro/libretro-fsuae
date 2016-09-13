@@ -355,15 +355,23 @@ static int g_warn_about_missing_config_file;
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 static void retro_wrap_emulator(void)
 {
-#ifdef LIBRETRO_FSUAE
-  static char *argv[] = { "fs-uae" };
-#else
-  static char *argv[] = { "puae" };
-#endif
+   static char *argv[1] = { NULL };
 
+#ifdef LINUX
+   {
+      char self_exe[PATH_MAX + 1];
+      if (readlink("/proc/self/exe", self_exe, PATH_MAX) >= 0)
+	 argv[0] = strdup(self_exe);
+      else
+	 fprintf(stderr, "WARNING: readlink /proc/self/exe failed\n");
+   }
+#endif /*LINUX*/
+   if (argv[0] == NULL) argv[0] = "retroarch";
+   
   //uae_restart(1, RPATH);
    keyboard_settrans();
 
+   fs_set_argv(sizeof(argv)/sizeof(*argv),argv);
    fs_init();  // sources/src/fs-uae/main.c: main()
    int error = fs_data_init("fs-uae", "fs-uae.dat");
    if (error) {
