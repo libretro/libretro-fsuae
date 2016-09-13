@@ -217,7 +217,7 @@ sed -r -i "s/^(#if)(def FSUAE)/\1 1 \/\/\2/" src/od-win32/mman.c src/od-win32/pi
   src/inputevents.def src/include/custom.h src/include/uae_memory.h src/custom.c src/include/autoconf.h src/sndboard.c src/disk.c \
   src/include/bsdsocket.h src/include/zfile.h src/jit/compemu_support.c src/filesys.c src/include/fsdb.h src/fsdb.c src/main.c \
   src/cpuboard.c src/jit/compemu_prefs.c src/memory.c src/writelog.c src/specialmonitors.c src/zfile.c src/qemuvga/qemuuaeglue.h src/od-win32/serial_win32.c \
-  src/gfxutil.c src/include/commpipe.h src/od-win32/dxwrap.h src/include/rommgr.h src/inputdevice.c src/cfgfile.c
+  src/gfxutil.c src/include/commpipe.h src/od-win32/dxwrap.h src/include/rommgr.h src/inputdevice.c src/cfgfile.c src/rommgr.c
 
 #-- patch
 (

@@ -19,7 +19,7 @@
 #include "autoconf.h"
 #include "filesys.h"
 
-#ifdef FSUAE // NL
+#if 1 //def FSUAE // NL
 #include "uae_fs.h"
 #endif
 
@@ -623,7 +623,7 @@ struct romlist **getromlistbyident (int ver, int rev, int subver, int subrev, co
 			continue;
 		if (model && !_tcsicmp (model, rd->name))
 			ok = 2;
-#ifdef FSUAE
+#if 1 //def FSUAE
 		/* If we get an exact match by model name, we do not want to downgrade
 		 * the match, otherwise we will fail the second model check below. */
 		// FIXME: Should probably send this else fix upstream.
@@ -1338,13 +1338,13 @@ static int read_rom_file (uae_u8 *buf, const struct romdata *rd)
 	struct zfile *zf;
 	struct romlist *rl = romlist_getrl (rd);
 	uae_char tmp[11];
-#ifdef FSUAE
+#if 1 //def FSUAE
 	write_log("read_rom_file\n");
 #endif
 
 	if (!rl || _tcslen (rl->path) == 0)
 		return 0;
-#ifdef FSUAE
+#if 1 //def FSUAE
 	write_log("read_rom_file (rl->path: '%s')\n", rl->path);
 #endif
 	zf = zfile_fopen3 (rl->path, _T("rb"), ZFD_NORMAL);
@@ -1359,7 +1359,7 @@ static int read_rom_file (uae_u8 *buf, const struct romdata *rd)
 		memcpy (buf, tmp, sizeof tmp);
 		zfile_fread (buf + sizeof tmp, rd->size - sizeof (tmp), 1, zf);
 	}
-#ifdef FSUAE
+#if 1 //def FSUAE
 	romlist_patch_rom(buf, rd->size);
 #endif
 	zfile_fclose (zf);
@@ -1386,7 +1386,7 @@ struct zfile *read_rom (struct romdata *prd)
 	uae_u32 crc32;
 	int size;
 	uae_u8 *buf, *buf2;
-#ifdef FSUAE
+#if 1 //def FSUAE
 	write_log("read_rom '%s'\n", prd->name);
 #endif
 
@@ -1545,12 +1545,12 @@ struct zfile *read_rom_name (const TCHAR *filename)
 {
 	int i;
 	struct zfile *f;
-#ifdef FSUAE
+#if 1 //def FSUAE
 		write_log("read_rom_name %s\n", filename);
 #endif
 
 	for (i = 0; i < romlist_cnt; i++) {
-#ifdef FSUAE
+#if 1 //def FSUAE
 		// FIXME: implement my_issamepath
 #endif
 		if (my_issamepath(filename, rl[i].path)) {
@@ -1576,7 +1576,7 @@ struct zfile *read_rom_name (const TCHAR *filename)
 			zfile_fread (buf, size, 1, f);
 			df = zfile_fopen_empty (f, _T("tmp.rom"), size);
 			decode_cloanto_rom_do (buf, size, size);
-#ifdef FSUAE
+#if 1 //def FSUAE
 			romlist_patch_rom(buf, size);
 #endif
 			zfile_fwrite (buf, size, 1, df);
@@ -1699,13 +1699,13 @@ int configure_rom (struct uae_prefs *p, const int *rom, int msg)
 void set_device_rom(struct uae_prefs *p, const TCHAR *path, int romtype, int devnum)
 {
 	int idx;
-#ifdef FSUAE
+#if 1 //def FSUAE
 	write_log("set_device_rom path=%s romtype=%d devnum=%d\n", path ? path : "(null)", romtype, devnum);
 #endif
 	const struct expansionromtype *ert = get_device_expansion_rom(romtype);
 	if (path == NULL) {
 		struct boardromconfig *brc = get_device_rom(p, romtype, devnum, &idx);
-#ifdef FSUAE
+#if 1 //def FSUAE
 		write_log("boardromconfig %p\n", brc);
 #endif
 		if (brc) {
@@ -1752,12 +1752,12 @@ struct boardromconfig *get_device_rom_new(struct uae_prefs *p, int romtype, int 
 	int idx2;
 	static struct boardromconfig fake;
 	const struct expansionromtype *ert = get_device_expansion_rom(romtype);
-#ifdef FSUAE
+#if 1 //def FSUAE
 	write_log("get_device_rom_new romtype=%d devnum=%d\n", romtype, devnum);
 #endif
 	if (!ert) {
 		*index = 0;
-#ifdef FSUAE
+#if 1 //def FSUAE
 	write_log("- return &fake\n");
 #endif
 		return &fake;
@@ -1781,18 +1781,18 @@ struct boardromconfig *get_device_rom_new(struct uae_prefs *p, int romtype, int 
 			brc = &p->expansionboard[i];
 			if (brc->device_type == 0) {
 				device_rom_defaults(brc, romtype, devnum);
-#ifdef FSUAE
+#if 1 //def FSUAE
 	write_log("- return brc ()\n");
 #endif
 				return brc;
 			}
 		}
-#ifdef FSUAE
+#if 1 //def FSUAE
 	write_log("- return &fake (2)\n");
 #endif
 		return &fake;
 	}
-#ifdef FSUAE
+#if 1 //def FSUAE
 	write_log("- return brc (2)\n");
 #endif
 	return brc;
@@ -1866,7 +1866,7 @@ struct zfile *read_device_from_romconfig(struct romconfig *rc, uae_u32 romtype)
 struct zfile *read_device_rom(struct uae_prefs *p, int romtype, int devnum, int *roms)
 {
 	int idx;
-#ifdef FSUAE
+#if 1 //def FSUAE
 	write_log("read_device_rom romtype=%d devnum=%d\n", romtype, devnum);
 #endif
 	struct boardromconfig *brc = get_device_rom(p, romtype, devnum, &idx);
