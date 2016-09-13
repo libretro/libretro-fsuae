@@ -22,6 +22,7 @@ Misc Issues:
  -This software handle the 'fs-uae' configuration files
  -On the local directory where 'fsuae_libretro.so' is located, /storage/df0.adf is your 'adf' file:
 
+```bash
 cat >a500.fs-uae <<EOF
 [config]
 amiga_model = A500
@@ -31,29 +32,40 @@ scale_x = 2.05
 zoom = 640x512+border
 floppy_drive_0 = /storage/df0.adf
 EOF
+```
 
 #The last command:
+
+```bash
 export LD_PREFER_MAP_32BIT_EXEC=1; # x86_64 only for JIT compatibility
 retroarch -L ./fsuae_libretro.so ./a500.fs-uae
+```
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Linux x86-64:
+
+```bash
 ./autogen.sh
 CFLAGS="-O2" ./configure --build=x86_64-pc-linux-gnu --prefix=/usr/local --enable-shared --disable-static --libdir=/usr/local/lib64 --enable-jit
 make gen -j 4
 make clean
 make -j 4
+```
 
 #Linux ARM: (-mthumb or -marm mode)
+
+```bash
 ./autogen.sh
 CFLAGS="-O2" ./configure --build=arm-pc-linux-gnueabihf --prefix=/usr/local --enable-shared --disable-static --libdir=/usr/local/lib --disable-jit --enable-neon
 make gen -j 4
 make clean
 make -j 4
-
+```
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 * x86_64: the JIT requires a 32 bits address range for some ELF loaded symbols; The following command is required:
+
+```bash
 export LD_PREFER_MAP_32BIT_EXEC=1
 
 cat >jit.patch <<EOF
@@ -69,4 +81,4 @@ cat >jit.patch <<EOF
     }
  
 EOF
-
+```
