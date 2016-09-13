@@ -66,8 +66,8 @@ The following parameters are likely required on many board to get real-time oper
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #A4000 / A3000 Emulation
-
 The file: 'fs-uae.dat' is required, and must be located, on one of the following directory (the base is the 'retroarch' executable directory): base/fs-uae.dat, base/../share/fs-uae/fs-uae.dat or base/../../Data/fs-uae.dat
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #JIT
 
