@@ -130,13 +130,20 @@ static char* read_custom_path(const char *key)
     return NULL;
 }
 
+const char* rt_get_save_dir(void)
+{
+    static const char* savedir;
+    environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &savedir);
+    return savedir;
+}
+
 const char* fs_uae_base_dir(void)
 {
     static const char* path;
     if (path) {
         return path;
     }
-
+#ifdef USE_FSUAEDIRS
     path = fs_config_get_const_string("base_dir");
     if (path) {
         fs_log("base specified via base_dir option\n");
@@ -179,7 +186,6 @@ const char* fs_uae_base_dir(void)
         fs_log("- using base dir $DOCUMENTS/FS-UAE\n");
         path = g_build_filename(fs_uae_documents_dir(), "FS-UAE", NULL);
     }
-
     int result = g_mkdir_with_parents(path, 0755);
     if (result == -1) {
         fs_emu_warning("Could not create base directory "
@@ -187,6 +193,10 @@ const char* fs_uae_base_dir(void)
         path = fs_uae_documents_dir();
     }
     fs_log("- using base ($BASE / $FSUAE) directory \"%s\"\n", path);
+#else
+    path = g_build_filename(rt_get_save_dir(), "fsuae", NULL);
+    g_mkdir_with_parents(path, 0755);
+#endif
     return path;
 }
 

@@ -15,6 +15,16 @@ GEN      = $(CORE_DIR)/sources/gen
 INCFLAGS := -I$(EMU) -I$(EMU)/include -I$(LIBRETRO) -I$(CORE_DIR)/libretro-include -I$(LIBUTILS) -I$(ODFS) -I$(ODFS)/include -I$(EMU)/../softfloat -I$(CORE_DIR) -I$(LIBFSEMU)/../include
 
 SOURCES_C =
+
+SOURCES_C += $(LIBRETRO)/libretro.c \
+				 $(CORE_DIR)/libco/libco.c \
+				 $(LIBRETRO)/libretro-mapper.c \
+				 $(LIBRETRO)/vkbd.c \
+				 $(LIBRETRO)/graph.c \
+				 $(LIBRETRO)/diskutils.c \
+				 $(LIBRETRO)/fontmsx.c 
+
+
 SOURCES_C +=  $(EMU)/main.c \
 				  $(EMU)/newcpu.c \
 				  $(EMU)/newcpu_common.c \
@@ -230,15 +240,6 @@ SOURCES_C += $(GUI)/dialog.c\
 				 $(GUI)/dlgRom.c \
 				 $(GUI)/dlgSystem.c \
 				 $(GUI)/sdlgui.c
-
-SOURCES_C += $(LIBRETRO)/libretro.c \
-				 $(CORE_DIR)/libco/libco.c \
-				 $(LIBRETRO)/libretro-mapper.c \
-				 $(LIBRETRO)/vkbd.c \
-				 $(LIBRETRO)/graph.c \
-				 $(LIBRETRO)/diskutils.c \
-				 $(LIBRETRO)/fontmsx.c 
-
 
 CFLAGS += -DUAE -DLIBRETRO_FSUAE -DUSE_GLIB -DUSE_PSEM
 
