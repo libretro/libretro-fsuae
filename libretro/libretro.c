@@ -359,7 +359,7 @@ static void retro_wrap_emulator(void)
 
 #ifdef LINUX
    {
-      char self_exe[PATH_MAX + 1];
+      char self_exe[PATH_MAX + 1] = { 0 };
       if (readlink("/proc/self/exe", self_exe, PATH_MAX) >= 0)
 	 argv[0] = strdup(self_exe);
       else

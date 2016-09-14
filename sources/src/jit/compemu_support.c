@@ -725,7 +725,7 @@ static void prepare_block(blockinfo* bi);
    soft) request occurs.
 */
 
-#if 0
+#ifdef __cplusplus
 template< class T >
 class LazyBlockAllocator
 {
@@ -822,12 +822,12 @@ static LazyBlockAllocator<checksum_info> ChecksumInfoAllocator;
 static HardBlockAllocator<blockinfo> BlockInfoAllocator;
 static HardBlockAllocator<checksum_info> ChecksumInfoAllocator;
 #endif
-#else /*0*/
-#define BlockInfoAllocator_acquire() malloc(sizeof(blockinfo))
+#else /*__cplusplus*/
+inline static blockinfo *BlockInfoAllocator_acquire(void) { blockinfo *p = malloc(sizeof(blockinfo)); if (p) p->direct_handler_to_use = NULL; return p; }
 #define BlockInfoAllocator_release(x) free((x))
 #define ChecksumInfoAllocator_acquire() malloc(sizeof(checksum_info))
 #define ChecksumInfoAllocator_release(x) free((x))
-#endif /*0*/
+#endif /*__cplusplus*/
 
 static inline checksum_info *alloc_checksum_info(void)
 {
