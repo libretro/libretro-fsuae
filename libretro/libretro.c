@@ -503,7 +503,7 @@ void retro_init(void)
 
    if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
    {
-      fprintf(stderr, "[libretro-uae]: RGB565 is not supported.\n");
+      fprintf(stderr, "[libretro-fsuae]: RGB565 is not supported.\n");
       exit(0);//return false;
    }
 
@@ -674,8 +674,7 @@ bool retro_load_game(const struct retro_game_info *info)
 	{
 	  while(fgets(filebuf, sizeof(filebuf), configfile))
 	    {
-	      sscanf(filebuf,"gfx_width = %d",&w);
-	      sscanf(filebuf,"gfx_height = %d",&h);
+	      sscanf(filebuf,"zoom = %dx%d", &w, &h);
 	    }
 	  fclose(configfile);
 	}
@@ -686,7 +685,7 @@ bool retro_load_game(const struct retro_game_info *info)
     h = defaulth;
     }
 
-  fprintf(stderr, "[libretro-uae]: resolution selected: %dx%d (default: %dx%d)\n", w, h, defaultw, defaulth);
+  fprintf(stderr, "[libretro-fsuae]: resolution selected: %dx%d (default: %dx%d)\n", w, h, defaultw, defaulth);
 
   retrow = w;
   retroh = h;
