@@ -96,3 +96,9 @@ export LD_PREFER_MAP_32BIT_EXEC=1
 ```
 
 This command is not enough, some ELF data segments must be located in the 32bits range too. This last issue is open.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Graphic Resolution / Crop
+
+Add a new option to 'crop' the graphic output: zoom = GFXWIDTHxGFXHEIGHT/GFX_OFFSETX/GFX_OFFSETY/GFX_CROPWIDTH/GFX_CROPHEIGHT The last two values are optional. This option is not compatible with the classical FS-UAE configuration file. Only the (GFX_CROPWIDTH,GFX_CROPHEIGHT) image size will be displayed.  e.g.: zoom = 688x464/8/56/680/404   (GFX_OFFSETX and GFX_CROPWIDTH must be a multiple of 4)
+

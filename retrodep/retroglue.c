@@ -27,9 +27,9 @@
 #include "libretro-glue.h"
 #include "libretro-mapper.h"
 
+#undef DEBUG
 #define DEBUG
 
-#define PIX_BYTES 2
 #define TD_POSY 30
 
 #define LOG_MSG(...) 
@@ -50,10 +50,6 @@
 #define R5G5B5A1_MASK_G 0x07c0
 #define R5G5B5A1_MASK_B 0x003e
 #define R5G5B5A1_MASK_A 0x0001
-
-
-extern int retrow; 
-extern int retroh;
 
 unsigned short int clut[] = {
 	0x0000,  /* full background transparency */
@@ -81,7 +77,7 @@ int opt_scanline = 0;
 
 /*-*/
 static RenderData g_renderdata;
-static uae_u8 g_linemem[4096 * 4];
+//static uae_u8 g_linemem[4096 * 4];
 static int g_red_bits;
 static int g_green_bits;
 static int g_blue_bits;
@@ -102,7 +98,7 @@ static int g_screen_updated = 0;
 
 int gui_init (void)
 {
-	
+  return 0;
 }
 
 /*
@@ -239,6 +235,8 @@ int retro_renderSound(short* samples, int sampleCount) {
     {
       retro_audio_cb( samples[i], samples[i+1]);
     }
+
+  return 0;
 }
 
 void InitOSGLU(void) {
@@ -369,7 +367,7 @@ int graphics_init(bool b) {
     g_alpha_shift  = uae_mask_shift(RGBA_MASK_A);
   }
 
-  currprefs.gfx_size_win.width=retrow;
+  currprefs.gfx_size_win.width = retrow;
 
 #ifdef ENABLE_LOG_SCREEN
   currprefs.gfx_height = 256;
@@ -377,20 +375,20 @@ int graphics_init(bool b) {
 #else
   currprefs.gfx_size_win.height= retroh;
 #endif	
-  opt_scrw = currprefs.gfx_size_win.width;
-  opt_scrh = currprefs.gfx_size_win.height;
+  opt_scrw = retrow;
+  opt_scrh = retroh;
 
-  if (currprefs.gfx_size_win.width>= 640) {
+  if (retrow>= 640) {
     //currprefs.gfx_lores = 0;
   } else {
     //	currprefs.gfx_lores = 1;
   }
   //vsync_enabled = currprefs.gfx_vsync;
-  LOG_MSG2("screen w=%i", currprefs.gfx_size_win.width);
-  LOG_MSG2("screen h=%i", currprefs.gfx_size_win.height);
+  LOG_MSG2("screen w=%i", retrow);
+  LOG_MSG2("screen h=%i", retroh);
 
 #ifdef ENABLE_LOG_SCREEN
-  pixbuf = malloc(currprefs.gfx_size_win.width * 576 * PIX_BYTES);
+  pixbuf = malloc(retroo * 576);
 #error ...
 #else
   pixbuf = (uae_u8 *) &bmp[0];
@@ -398,31 +396,31 @@ int graphics_init(bool b) {
 	
 #ifdef DEBUG
   fprintf(stderr, "%s %d %s --\n", __FILE__, __LINE__, __FUNCTION__);
-  fprintf(stderr, "graphics init  pixbuf=%p color_mode=%d wh=%dx%d (%p) bpp=%d (%d)\n", pixbuf, currprefs.color_mode, currprefs.gfx_size_win.width, currprefs.gfx_size_win.height,&bmp[0], g_amiga_video_bpp, PIX_BYTES);
+  fprintf(stderr, "graphics init  pixbuf=%p color_mode=%d wh=%dx%d (%p) bpp=%d (%d)\n", pixbuf, currprefs.color_mode, retrow, retroh,&bmp[0], g_amiga_video_bpp, retroo);
 #endif /*DEBUG*/
   if (pixbuf == NULL) {
     fprintf(stderr, "Error: not enough memory to initialize screen buffer!\n");
     return -1;
   }
-  memset(pixbuf, 0x80, currprefs.gfx_size_win.width * currprefs.gfx_size_win.height * PIX_BYTES);
+  memset(pixbuf, 0x80, retroh * retroo);
 
   // g_bufmem = (unsigned char*) malloc(AMIGA_WIDTH * AMIGA_HEIGHT * g_amiga_video_bpp); gfxvidinfo.drawbuffer.bufmem = g_bufmem; memset(g_bufmem, 0, AMIGA_WIDTH * AMIGA_HEIGHT * g_amiga_video_bpp);
   memset(g_renderdata.line, 0, AMIGA_MAX_LINES);
-  gfxvidinfo.drawbuffer.width_allocated = currprefs.gfx_size_win.width;
-  gfxvidinfo.drawbuffer.height_allocated = currprefs.gfx_size_win.height;
+  gfxvidinfo.drawbuffer.width_allocated = retroo / retrop;
+  gfxvidinfo.drawbuffer.height_allocated = retroh;
   gfxvidinfo.maxblocklines = MAXBLOCKLINES_MAX;
   //gfxvidinfo.drawbuffer.pixbytes = g_amiga_video_bpp;
-  gfxvidinfo.drawbuffer.pixbytes = PIX_BYTES;
-  gfxvidinfo.drawbuffer.rowbytes = gfxvidinfo.drawbuffer.width_allocated * gfxvidinfo.drawbuffer.pixbytes ;
+  gfxvidinfo.drawbuffer.pixbytes = retrop;
+  gfxvidinfo.drawbuffer.rowbytes = retroo ;
   gfxvidinfo.drawbuffer.bufmem = pixbuf;
   gfxvidinfo.drawbuffer.emergmem = 0;
   gfxvidinfo.drawbuffer.linemem = 0;
   //memset(gfxvidinfo.line, 0, AMIGA_MAX_LINES);
   /*-*/
-  gfxvidinfo.drawbuffer.inheight  = gfxvidinfo.drawbuffer.height_allocated;
-  gfxvidinfo.drawbuffer.outheight = gfxvidinfo.drawbuffer.height_allocated;
-  gfxvidinfo.drawbuffer.inwidth   = gfxvidinfo.drawbuffer.width_allocated;
-  gfxvidinfo.drawbuffer.outwidth  = gfxvidinfo.drawbuffer.width_allocated;
+  gfxvidinfo.drawbuffer.inheight  = retroh;
+  gfxvidinfo.drawbuffer.outheight = retroh;
+  gfxvidinfo.drawbuffer.inwidth   = retrow;
+  gfxvidinfo.drawbuffer.outwidth  = retrow;
   /*-*/
   gfxvidinfo.drawbuffer.lockscr = retro_lockscr;
   gfxvidinfo.drawbuffer.unlockscr = retro_unlockscr;
@@ -820,7 +818,7 @@ bool target_graphics_buffer_update (void) {
 #ifdef DEBUG
   fprintf(stderr, "%s %d %s -- target_graphics_buffer_update - clearing buffer\n", __FILE__, __LINE__, __FUNCTION__);
 #endif /*DEBUG*/
-  memset(bmp, 0x00, retrow * retroh * sizeof(*bmp));
+  memset(bmp, 0x00, retroh * retroo);
   memset(g_renderdata.line, 0, AMIGA_MAX_LINES);
   return 0;
 }
@@ -888,9 +886,11 @@ struct uae_filter *usedfilter;
 uae_u32 redc[3 * 256], grec[3 * 256], bluc[3 * 256];
 
 static double remembered_vblank;
-static int vblankbasewait, vblankbasefull;
+//static int vblankbasewait, vblankbasefull;
 
+#ifdef USE_BUFMEM
 static unsigned char* g_bufmem = NULL;
+#endif
 
 
 int g_amiga_rtg_modes[] = {
@@ -1049,23 +1049,25 @@ static bool render_frame(bool immediate)
 }
 #endif
 
-static int minimized;
-static int monitor_off;
+//static int minimized;
+//static int monitor_off;
 
+#if 0
 static int dx_islost(void)
 {
         return 0;
 }
+#endif
 
 bool render_screen(bool immediate)
 {
-    bool v = false;
-    int cnt;
+  //bool v = false;
+  //int cnt;
 
 #ifdef DEBUG
     {
       static int t_c = 0;
-      if ( ((t_c++) % 50) == 0 ) fprintf(stderr, "%s %d %s -- p=%d outb=%d r=%f\n", __FILE__, __LINE__, __FUNCTION__, g_picasso_enabled, gfxvidinfo.outbuffer, g_renderdata.refresh_rate);
+      if ( ((t_c++) % 50) == 0 ) fprintf(stderr, "%s %d %s -- p=%d outb=%p r=%f\n", __FILE__, __LINE__, __FUNCTION__, g_picasso_enabled, gfxvidinfo.outbuffer, g_renderdata.refresh_rate);
     }
 #endif /*DEBUG*/
 
@@ -1173,13 +1175,13 @@ double vblank_calibrate (double approx_vblank, bool waitonly) {
 
 // FIXME: What is this?
 int extraframewait = 0;
-static int frame_missed, frame_counted, frame_errors;
-static int frame_usage, frame_usage_avg, frame_usage_total;
+//static int frame_missed, frame_counted, frame_errors;
+//static int frame_usage, frame_usage_avg, frame_usage_total;
 //extern int log_vsync;
 static bool dooddevenskip;
 static volatile frame_time_t vblank_prev_time, thread_vblank_time;
 //static bool vblankbaselace;
-static int vblankbaselace_chipset;
+//static int vblankbaselace_chipset;
 //static bool vblankthread_oddeven;
 
 int log_vsync = 0, debug_vsync_min_delay = 0, debug_vsync_forced_delay = 0;
@@ -1190,9 +1192,11 @@ void vsync_busywait_start(void) {
     vblank_prev_time = thread_vblank_time;
 }
 
+#if 0
 static bool isthreadedvsync (void) {
     return isvsync_chipset () <= -2 || isvsync_rtg () < 0;
 }
+#endif
 
 // FIXME
 bool vsync_isdone (void) {
@@ -1296,8 +1300,8 @@ int vsync_busywait_do (int *freetime, bool lace, bool oddeven) {
 #endif
 }
 
-static void vsync_sleep (bool preferbusy) {
 #if 0
+static void vsync_sleep (bool preferbusy) {
     struct apmode *ap = picasso_on ? &currprefs.gfx_apmode[1] : &currprefs.gfx_apmode[0];
     bool dowait;
     if (vsync_busy_wait_mode == 0) {
@@ -1310,13 +1314,12 @@ static void vsync_sleep (bool preferbusy) {
     dowait = true;
     if (dowait && currprefs.m68k_speed >= 0)
         sleep_millis_main (1);
-#endif
 }
+#endif
 
-
+#if 0
 static void vsync_notvblank (void) {
     return;
-#if 0
     for (;;) {
         int vp;
         if (!getvblankpos (&vp))
@@ -1327,8 +1330,8 @@ static void vsync_notvblank (void) {
         }
         vsync_sleep (true);
     }
-#endif
 }
+#endif
 
 int target_get_display (const TCHAR *name) {
     return 0;
@@ -1410,14 +1413,14 @@ void unlockscr(struct vidbuffer *buffer)
 
 static void grow_render_buffer(int width, int height)
 {
-    unsigned char *new_pixels = (unsigned char*) g_renderdata.grow(width, height);
+  // unsigned char *new_pixels = (unsigned char*) g_renderdata.grow(width, height);
 
 #ifdef DEBUG
     fprintf(stderr, "%s %d %s -- %dx%d\n", __FILE__, __LINE__, __FUNCTION__, width, height);
 #endif /*DEBUG*/
     if(width>0 && width<=EMULATOR_MAX_WIDTH && height>0 && height<EMULATOR_MAX_HEIGHT) {
-    retrow = width;
-    retroh = height;
+      //retrow = width;
+      //retroh = height;
     }
 #if 0
     if (new_pixels != g_renderdata.pixels) {

@@ -23,6 +23,10 @@ extern cothread_t emuThread;
 
 extern int retrow; 
 extern int retroh;
+extern int retrox; 
+extern int retroy;
+extern int retrop;
+extern int retroo;
 extern int CROP_WIDTH;
 extern int CROP_HEIGHT;
 

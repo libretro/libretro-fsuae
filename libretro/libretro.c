@@ -25,8 +25,14 @@ cothread_t emuThread;
 
 int defaultw = EMULATOR_DEF_WIDTH;
 int defaulth = EMULATOR_DEF_HEIGHT;
-int retrow = 0;
-int retroh = 0;
+int retrow = 0; /* full buffer width amiga side */
+int retroh = 0; /* full buffer height amiga side */
+int retrox = 0; /* offset */
+int retroy = 0; /* offset */
+int retrop = 2; /* pixel width */
+int retroo = 0; /* line size */
+int retrocw = 0; /* output width */
+int retroch = 0; /* output height */
 int CROP_WIDTH;
 int CROP_HEIGHT;
 int sndbufpos=0;
@@ -34,6 +40,8 @@ char key_state[512];
 char key_state2[512];
 bool opt_analog = false;
 static int firstps = 0;
+static enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
+
 
 extern unsigned short int  bmp[EMULATOR_MAX_WIDTH*EMULATOR_MAX_HEIGHT];
 extern unsigned short int  savebmp[EMULATOR_MAX_WIDTH*EMULATOR_MAX_HEIGHT];
@@ -88,7 +96,8 @@ double fs_emu_video_offset_y = 0.0;
 void retro_set_environment(retro_environment_t cb)
 {
    struct retro_variable variables[] = {
-     { "resolution", "Internal resolution; 640x400|640x432|640x480|640x540|704x480|704x540|720x480|720x540|800x600|1024x768", },
+     { "fsuaeresolution", "Internal resolution; 640x400|640x432|640x480|640x540|704x480|704x540|720x480|720x540|800x600|1024x768", },
+     { "fsuaefmt", "Pixel Format; RGB565|XRGB8888", },
      { "analog","Use Analog; OFF|ON", },
      { "leds","Leds; Standard|Simplified|None", },
      { NULL, NULL },
@@ -106,7 +115,7 @@ static void update_variables(void)
 {
    struct retro_variable var = {0};
 
-   var.key = "resolution";
+   var.key = "fsuaeresolution";
    var.value = NULL;
 
 #if 0
@@ -155,6 +164,16 @@ static void update_variables(void)
         ledtype = 2;  
       }
    }
+
+   var.key = "fsuaefmt";
+   var.value = NULL;
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      if (strcmp(var.value, "XRGB8888") == 0)
+      {
+	fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+      }
+   }   
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -446,7 +465,10 @@ static void retro_wrap_emulator(void)
      amiga_init_jit_compiler();
    }
 
-   amiga_set_video_format(AMIGA_VIDEO_FORMAT_R5G6B5);
+   if (retrop == 2)
+     amiga_set_video_format(AMIGA_VIDEO_FORMAT_R5G6B5);
+   else
+     amiga_set_video_format(AMIGA_VIDEO_FORMAT_BGRA);
 
    //amiga_set_video_format(AMIGA_VIDEO_FORMAT_RGBA);
    //amiga_set_video_format(AMIGA_VIDEO_FORMAT_BGRA);
@@ -455,7 +477,7 @@ static void retro_wrap_emulator(void)
 
    amiga_add_rtg_resolution(672, 540);
    amiga_add_rtg_resolution(960, 540);
-   amiga_add_rtg_resolution(retrow, retroh);
+   //amiga_add_rtg_resolution(retrow, retroh);
    //fs_uae_init_video();
    fs_uae_init_mouse();
    //fs_emu_run(main_function);
@@ -496,17 +518,9 @@ static void retro_wrap_emulator(void)
 
 void retro_init(void)
 {
-   enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
-
    memset(key_state, 0, sizeof(key_state));
    memset(key_state2, 0, sizeof(key_state2));
-
-   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
-   {
-      fprintf(stderr, "[libretro-fsuae]: RGB565 is not supported.\n");
-      exit(0);//return false;
-   }
-
+   
    InitOSGLU();
    memset(bmp, 0, sizeof(bmp));
 
@@ -643,9 +657,9 @@ void retro_run(void) {
   }
 
  sortie:
-  video_cb(bmp,retrow,retroh , retrow << 1);
+  video_cb(((char *)bmp) + (retroo * retroy) + (retrop * retrox), retrocw, retroch, retroo);
 #ifdef DEBUG_RETRORUN
-  fprintf(stderr, "%s %d %s --------------------\n", __FILE__, __LINE__, __FUNCTION__);
+  fprintf(stderr, "%s %d %s -------------------- (%d,%d,%d,%d)\n", __FILE__, __LINE__, __FUNCTION__, retrox, retroy, retrow, retroh);
 #endif /*DEBUG*/
   co_switch(emuThread);
 #ifdef DEBUG_RETRORUN
@@ -656,6 +670,7 @@ void retro_run(void) {
 bool retro_load_game(const struct retro_game_info *info)
 {
   int w = 0, h = 0;
+  char gfxmode[32] = { 0 };
 
   environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_descriptors);
 
@@ -674,21 +689,69 @@ bool retro_load_game(const struct retro_game_info *info)
 	{
 	  while(fgets(filebuf, sizeof(filebuf), configfile))
 	    {
-	      sscanf(filebuf,"zoom = %dx%d", &w, &h);
+	      sscanf(filebuf,"zoom = %dx%d%31s", &w, &h, gfxmode);
 	    }
 	  fclose(configfile);
 	}
     }
 
+  if (gfxmode[0] == '/') {
+    int r;
+    r=sscanf(&gfxmode[1],"%d/%d/%d/%d", &retrox, &retroy, &retrocw, &retroch);
+    if (r == 2)
+      { retrocw = 0; retroch = 0; }
+    else if (r != 4)
+      { retrox = 0; retroy = 0; retrocw = 0; retroch = 0; }
+  
+    if (retrox  & 3) retrox  = 0;
+    if (retrocw & 3) retrocw = 0;
+    if (retrox < 0) retrox = 0;
+    if (retroy < 0) retroy = 0;
+    if (retrocw < 0) retrocw = 0;
+    if (retroch < 0) retroch = 0;
+
+    if (retrox + retrocw > w) retrocw = 0;
+    if (retroy + retroch > h) retroch = 0;
+  }
+  else if (!strcmp("",gfxmode)) {
+    if (w > 64 && h > 64) {
+      retrox = 8;
+      retroy = 20;
+      retrocw = w - retrox * 2;
+      retroch = h - retroy * 2;
+    }
+  }
+  else if (!strcmp("+border",gfxmode)) {
+    retrox = 0;
+    retroy = 0;
+  }
+
   if (w<=0 || h<=0 || w>EMULATOR_MAX_WIDTH || h>EMULATOR_MAX_HEIGHT) {
     w = defaultw;
     h = defaulth;
+    retrox = 0;
+    retroy = 0;
     }
-
-  fprintf(stderr, "[libretro-fsuae]: resolution selected: %dx%d (default: %dx%d)\n", w, h, defaultw, defaulth);
 
   retrow = w;
   retroh = h;
+
+  if (!retrocw) retrocw = retrow - retrox;
+  if (!retroch) retroch = retroh - retroy;
+
+  if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt)) {
+      fprintf(stderr, "[libretro-fsuae]: %x is not supported.\n", fmt);
+      exit(0);//return false;
+   }
+
+   if (fmt == RETRO_PIXEL_FORMAT_XRGB8888)
+     retrop = 4;
+
+   retroo = retrow * retrop;
+   retroo = (retroo + 7) & ~7;
+
+   fprintf(stderr, "[libretro-fsuae]: resolution selected: %dx%d<%s> (default: %dx%d) [%d,%d,%d,%d,%d]\n", retrow, retroh, gfxmode, defaultw, defaulth, retrox, retroy, retrocw, retroch, retrop);
+
   CROP_WIDTH = retrow;
   CROP_HEIGHT = (retroh-80);
   memset(bmp, 0, sizeof(bmp));

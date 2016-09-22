@@ -20,6 +20,7 @@ const char SDLGui_fileid[] = "Hatari sdlgui.c : " __DATE__ " " __TIME__;
 
 #include "utype.h"
 #include "graph.h"
+#include "../libretro/libretro-glue.h"
 
 typedef struct{
      int16_t x, y;
@@ -29,7 +30,6 @@ typedef struct{
 #include "dialog.h"
 #include "sdlgui.h"
 
-extern int retroh,retrow;
 #define SDL_Delay GetTicks2
 #define TEXTURE_WIDTH retrow
 #define TEXTURE_HEIGHT retroh
