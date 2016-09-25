@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([FS-UAE], [2.7.15dev],
+AC_INIT([FS-UAE], [2.7.16dev],
         [frode@fs-uae.net], [fs-uae], [http://fs-uae.net])
 AC_CONFIG_AUX_DIR([.])
 AC_CANONICAL_HOST
@@ -14,6 +14,7 @@ AC_CONFIG_HEADERS([config.h])
 # AC_CONFIG_MACRO_DIRS([m4])
 m4_include([m4/ax_c___builtin_expect.m4])
 m4_include([m4/ax_check_compile_flag.m4])
+m4_include([m4/ax_check_link_flag.m4])
 m4_include([m4/ax_gcc_var_attribute.m4])
 m4_include([m4/ax_gcc_func_attribute.m4])
 
@@ -87,7 +88,7 @@ AS_IF([test "x$enable_static" = xyes],
       [PKG_CONFIG="$PKG_CONFIG --static"])
 
 
-# Compiler flags
+# Compiler / linker feature checks
 
 AX_CHECK_COMPILE_FLAG(-fno-strict-overflow,
 [f_no_strict_overflow=yes],
@@ -119,7 +120,11 @@ AX_CHECK_COMPILE_FLAG(-Wmissing-format-attribute,
 AM_CONDITIONAL([W_MISSING_FORMAT_ATTRIBUTE],
 [test x$w_missing_format_attribute = xyes])
 
-# Compiler features
+dnl AX_CHECK_LINK_FLAG(-no-pie,
+dnl [no_pie=yes],
+dnl [no_pie=no])
+dnl AM_CONDITIONAL([NO_PIE],
+dnl [test x$no_pie = xyes])
 
 AX_C___BUILTIN_EXPECT
 
@@ -627,6 +632,7 @@ AS_IF([test "x$enable_jit" != xno], [
 	AC_SUBST(USE_JIT, 0)
     ])
 ], [AC_SUBST(USE_JIT, 0)])
+
 AC_ARG_ENABLE([neon], [AS_HELP_STRING([--disable-neon], [ARM neon])])
 AS_IF([test "x$enable_neon" != xno], [
     AC_TRY_COMPILE([
