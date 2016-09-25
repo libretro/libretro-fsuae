@@ -374,7 +374,7 @@ static int g_warn_about_missing_config_file;
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 static void retro_wrap_emulator(void)
 {
-   static char *argv[1] = { NULL };
+  static char *argv[] = { NULL, "-J", "M0" };
 
 #ifdef LINUX
    {
