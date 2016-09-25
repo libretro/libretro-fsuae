@@ -1,0 +1,12 @@
+#! /bin/bash
+git checkout master
+git remote add fsuae https://github.com/FrodeSolheim/fs-uae.git
+git pull fsuae master
+git rm -r po share fs-uae.spec dist debian Makefile.am INSTALL glee icon lua tests contrib flac glad bootstrap ./doc/options/amiga_model
+git commit -m "Prepare merge."
+git checkout libretro-fsuae
+git pull
+git status
+git merge master
+#git merge --abort
+#git reset --hard <sha1-commit-id>
