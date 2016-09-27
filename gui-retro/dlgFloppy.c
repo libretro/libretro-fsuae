@@ -22,7 +22,13 @@ const char DlgFloppy_fileid[] = "Hatari dlgFloppy.c : " __DATE__ " " __TIME__;
 #include "options.h"
 #include "disk.h"
 
-#define Log_AlertDlg printf
+#include "uae/uae.h"
+#include <fs/emu.h>
+#ifdef USE_GLIB
+#include <glib.h>
+#endif /*USE_GLIB*/
+
+#define Log_AlertDlg fprintf
 #define LOG_INFO stderr
 #define LOG_ERROR stderr
 
@@ -57,10 +63,16 @@ char szDiskImageDirectory[FILENAME_MAX]={'\0'};
 #define FLOPPYDLG_IMGDIR      19
 #define FLOPPYDLG_BROWSEIMG   20
 #define FLOPPYDLG_EXIT        22
+#ifdef LIBRETRO_FSUAE
+#define FLOPPY_SWAPMAX         8
+#else /*LIBRETRO_FSUAE*/
+#define FLOPPY_SWAPMAX         0
+#endif /*LIBRETRO_FSUAE*/
+
 
 
 /* The floppy disks dialog: */
-static SGOBJ floppydlg[] =
+static SGOBJ floppydlg[FLOPPYDLG_EXIT + 1 + FLOPPY_SWAPMAX] =
 {
 	{ SGBOX, 0, 0, 0,0, 64,20, NULL },
 	{ SGTEXT, 0, 0, 25,1, 12,1, "Floppy disks" },
@@ -70,8 +82,7 @@ static SGOBJ floppydlg[] =
 	{ SGTEXT, 0, 0, 3,4, 58,1, NULL },
 	{ SGTEXT, 0, 0, 2,6, 8,1, "DF1:" },
 	{ SGBUTTON,  SG_EXIT/*0*/, 0, 46,6, 7,1, "Eject" },
-	{ SGBUTTON,  SG_EXIT/*0*/, 0, 54,6, 8,1, "Browse" }
-,
+	{ SGBUTTON,  SG_EXIT/*0*/, 0, 54,6, 8,1, "Browse" },
 	{ SGTEXT, 0, 0, 3,7, 58,1, NULL },
 	{ SGTEXT, 0, 0, 2,9, 8,1, "DF2:" },
 	{ SGBUTTON,  SG_EXIT/*0*/, 0, 46,9, 7,1, "Eject" },
@@ -91,11 +102,21 @@ static SGOBJ floppydlg[] =
 	{ -1, 0, 0, 0,0, 0,0, NULL }
 };
 
+#ifdef LIBRETRO_FSUAE
+#define FLOPPYDLG_SWAP 23
+int floppyswapnum = 0;
+
+struct floppyswap {
+  int y;
+  int x;
+} floppyswap[FLOPPY_SWAPMAX];
+#endif /*LIBRETRO_FSUAE*/
 
 #define DLGMOUNT_A       2
 #define DLGMOUNT_B       3
 #define DLGMOUNT_CANCEL  4
 
+#if 0
 /* The "Alert"-dialog: */
 static SGOBJ alertdlg[] =
 {
@@ -106,6 +127,7 @@ static SGOBJ alertdlg[] =
 	{ SGBUTTON, SG_EXIT/*SG_CANCEL*/, 0, 27,4, 10,1, "Cancel" },
 	{ -1, 0, 0, 0,0, 0,0, NULL }
 };
+#endif
 
 /*-----------------------------------------------------------------------*/
 /**
@@ -243,6 +265,7 @@ static void DlgDisk_BrowseDir(char *dlgname, char *confname, int maxlen)
 }
 
 
+#if 0
 /**
  * Ask whether new disk should be inserted to A: or B: and if yes, insert.
  */
@@ -282,18 +305,196 @@ while (but != DLGMOUNT_CANCEL && but != DLGMOUNT_A  && but != DLGMOUNT_B && but 
 	if (realname)
 		File_ShrinkName(dlgname, realname, floppydlg[dlgid].w);
 }
+#endif
 
+#ifdef LIBRETRO_FSUAE
+static void get_drive_for_index(int index, int *type, int *drive) {
+    int count = 0;
+    int num_floppy_drives = amiga_get_num_floppy_drives();
+    int num_cdrom_drives = amiga_get_num_cdrom_drives();
+#if 0
+    if (g_fs_uae_amiga_model == MODEL_CD32 ||
+            g_fs_uae_amiga_model == MODEL_CDTV) {
+        if (num_cdrom_drives < 1) {
+            num_cdrom_drives = 1;
+        }
+    }
+#endif /*0*/
+    //printf("num drives: floppy %d cd-rom %d\n", num_floppy_drives,
+    //        num_cdrom_drives);
+
+    for (int i = 0; i < num_cdrom_drives; i++) {
+        if (index == count) {
+            *type = 1;
+            *drive = i;
+            return;
+        }
+        count++;
+    }
+    for (int i = 0; i < num_floppy_drives; i++) {
+        if (index == count) {
+            *type = 0;
+            *drive = i;
+            return;
+        }
+        count++;
+    }
+    *type = -1;
+    *drive = 0;
+}
+
+static char *get_floppy_label(const char* path) {
+  if (!path || path[0] == '\0') {
+    return g_strdup("");
+  }
+  char *name = g_path_get_basename(path);
+#ifdef USE_GLIB
+  GError *error = NULL;
+  GRegex *re = g_regex_new("([A-Za-z0-9_ ]*[Dd][Ii][Ss][Kk][A-Za-z0-9_ ]*)",  0, 0, &error);
+  if (error) {
+    fprintf(stderr, " *** error\n");
+    return name;
+  }
+  GMatchInfo *mi = NULL;
+  if (!g_regex_match(re, name, 0, &mi) || !g_match_info_matches(mi)) {
+    //fprintf(stderr, " *** false\n");
+    g_match_info_free(mi);
+    g_regex_unref(re);
+    return name;
+  }
+  //fprintf(stderr, " *** ok?\n");
+  char *result = g_match_info_fetch(mi, 1);
+  g_match_info_free(mi);
+  g_regex_unref(re);
+  if (!result) {
+    return name;
+  }
+  g_free(name);
+  return result;
+#else
+  return name;
+#endif
+}
+
+#define disk_eject(x) insert_disk((x), -1)
+
+static void insert_disk(int drive_index, int disk_index) {
+  if (disk_index == -1) {
+    fprintf(stderr, "menu: eject disk from drive %d\n", drive_index);
+    int action = INPUTEVENT_SPC_EFLOPPY0 + drive_index;
+    //fs_emu_queue_action(action, 1);
+    ////fs_emu_queue_action(action, 0);
+    amiga_send_input_event(action, 1);
+    return;
+  }
+  fprintf(stderr, "menu: insert disk index %d into df%d\n", disk_index, drive_index);
+  int action = INPUTEVENT_SPC_DISKSWAPPER_0_0;
+  action += drive_index * AMIGA_FLOPPY_LIST_SIZE + disk_index;
+  //fs_emu_queue_action(action, 1);
+  amiga_send_input_event(action, 1);
+}
+
+static int media_menu_function() {
+  if (floppyswapnum) {
+    for (int i=0;i<floppyswapnum;i++) free(floppydlg[FLOPPYDLG_SWAP+i].txt);
+  }
+
+  floppyswapnum = 0;
+
+  for (int index = 0;index < 4 && floppyswapnum < FLOPPY_SWAPMAX;index++) {
+    int drive, type;
+    get_drive_for_index(index, &type, &drive);
+
+    if (type == 0) { // floppy
+      char *str;
+      //fprintf(stderr, "%s:%d for df%d\n", __FUNCTION__, __LINE__, drive);
+
+      for (int i = -1; i < AMIGA_FLOPPY_LIST_SIZE && floppyswapnum < FLOPPY_SWAPMAX; i++) {
+	if (i == -1) {
+	  //fs_emu_menu_item_set_title(item, _("Eject"));
+	}
+	else {
+	  const char *path = amiga_floppy_get_list_entry(i);
+	  int n;
+	  str = get_floppy_label(path);
+	  //fs_emu_menu_item_set_title(item, str);
+	  if (str != NULL && (n=strlen(str)) != 0) {
+	    char nam[256] = {0};
+	    char buf[32] = {0};
+	    if (n<sizeof(nam)) {
+	      strncpy(nam, str, sizeof(nam));
+	      if (n>=4 && !strcmp(".adf", &nam[n-4])) {
+		nam[n-4]=0;
+		sprintf(buf, "%d:%s", index, (n<14+4 ? nam:&nam[n-14-4]));
+	      }
+	      else
+		sprintf(buf, "%d:%s", index, (n<14 ? nam:&nam[n-14]));
+	      //fprintf(stderr, "%s:%d index=%d,i=%d <%s> -> <%s>\n", __FUNCTION__, __LINE__, index, i, str, buf);
+	      floppyswap[floppyswapnum].x = index;
+	      floppyswap[floppyswapnum].y = i;
+
+	      //{ SGBUTTON,  SG_EXIT/*0*/, 0, 46,12, 7,1, "Eject" }, /*15*/
+	      floppydlg[FLOPPYDLG_SWAP+floppyswapnum].type  = SGBUTTON;
+	      floppydlg[FLOPPYDLG_SWAP+floppyswapnum].flags = SG_EXIT;
+	      floppydlg[FLOPPYDLG_SWAP+floppyswapnum].state = 0;
+	      floppydlg[FLOPPYDLG_SWAP+floppyswapnum].x     = 2 + 16*floppyswapnum;
+	      floppydlg[FLOPPYDLG_SWAP+floppyswapnum].y     = 16;
+	      floppydlg[FLOPPYDLG_SWAP+floppyswapnum].w     = 16;
+	      floppydlg[FLOPPYDLG_SWAP+floppyswapnum].h     = 1;
+	      floppydlg[FLOPPYDLG_SWAP+floppyswapnum].txt = strdup(buf);
+	      floppyswapnum++;
+	    }
+	  }
+	  free(str);
+	}
+
+	//fs_emu_menu_item_set_type(item, FS_EMU_MENU_ITEM_TYPE_ITEM);
+	//fs_emu_menu_item_set_idata(item, i);
+	if (drive == 0) {
+	  //fs_emu_menu_item_set_activate_function(item, df0_function);
+	}
+	else if (drive == 1) {
+	  //fs_emu_menu_item_set_activate_function(item, df1_function);
+	}
+	else if (drive == 2) {
+	  //fs_emu_menu_item_set_activate_function(item, df2_function);
+	}
+	else if (drive == 3) {
+	  //fs_emu_menu_item_set_activate_function(item, df3_function);
+	}
+      }
+    }
+    else {
+      //fprintf(stderr, "%s: type=%d not supported...\n", __FUNCTION__, type);
+    }
+  }
+
+  floppydlg[FLOPPYDLG_SWAP+floppyswapnum].type  = -1;
+  floppydlg[FLOPPYDLG_SWAP+floppyswapnum].flags = 0;
+  floppydlg[FLOPPYDLG_SWAP+floppyswapnum].state = 0;
+  floppydlg[FLOPPYDLG_SWAP+floppyswapnum].x     = 0;
+  floppydlg[FLOPPYDLG_SWAP+floppyswapnum].y     = 0;
+  floppydlg[FLOPPYDLG_SWAP+floppyswapnum].w     = 0;
+  floppydlg[FLOPPYDLG_SWAP+floppyswapnum].h     = 0;
+  floppydlg[FLOPPYDLG_SWAP+floppyswapnum].txt = NULL;
+  return 0;
+}
+#endif /*LIBRETRO_FSUAE*/
 
 /**
  * Show and process the floppy disk image dialog.
  */
 void DlgFloppy_Main(void)
 {
-	int but, i;
-	char *newdisk;
+	int but;
+	//char *newdisk;
 	char dlgname[MAX_FLOPPYDRIVES][64], dlgdiskdir[64];
 
 	SDLGui_CenterDlg(floppydlg);
+
+#ifdef LIBRETRO_FSUAE
+	media_menu_function();
+#endif /*LIBRETRO_FSUAE*/
 
 	/* Set up dialog to actual values: */
 
@@ -346,7 +547,9 @@ void DlgFloppy_Main(void)
 			dlgname[0][0] = '\0';
 
 				changed_prefs.floppyslots[0].df[0] = 0;
+#ifndef LIBRETRO_FSUAE
 				DISK_check_change();
+#endif /*LIBRETRO_FSUAE*/
 				disk_eject(0);
 			break;
 		 case FLOPPYDLG_BROWSEA:                        /* Choose a new disk A: */
@@ -377,7 +580,9 @@ void DlgFloppy_Main(void)
 			dlgname[1][0] = '\0';
 
 				changed_prefs.floppyslots[1].df[0] = 0;
+#ifndef LIBRETRO_FSUAE
 				DISK_check_change();
+#endif /*LIBRETRO_FSUAE*/
 				disk_eject(1);
 
 			break;
@@ -404,7 +609,9 @@ void DlgFloppy_Main(void)
 			dlgname[2][0] = '\0';
 
 				changed_prefs.floppyslots[2].df[0] = 0;
+#ifndef LIBRETRO_FSUAE
 				DISK_check_change();
+#endif /*LIBRETRO_FSUAE*/
 				disk_eject(2);
 			break;
 		 case FLOPPYDLG_BROWSE2:                        /* Choose a new disk A: */
@@ -435,7 +642,9 @@ void DlgFloppy_Main(void)
 			dlgname[3][0] = '\0';
 
 				changed_prefs.floppyslots[3].df[0] = 0;
+#ifndef LIBRETRO_FSUAE
 				DISK_check_change();
+#endif /*LIBRETRO_FSUAE*/
 				disk_eject(3);
 
 			break;
@@ -474,6 +683,13 @@ void DlgFloppy_Main(void)
 			}
 			break;
 */
+		default:
+		  if (but>=FLOPPYDLG_SWAP && but<FLOPPYDLG_SWAP+FLOPPY_SWAPMAX) {
+		    int i=but-FLOPPYDLG_SWAP;
+		    if (i<floppyswapnum) {
+		      insert_disk(floppyswap[i].x, floppyswap[i].y);
+		    } else fprintf(stderr, "%s %s:%d i=%d\n", __FILE__, __FUNCTION__, __LINE__, i);
+		  } /*else fprintf(stderr, "%s %s:%d but=%d\n", __FILE__, __FUNCTION__, __LINE__, but);*/
 		}
                 gui_poll_events();
 	}
