@@ -556,7 +556,9 @@ void DlgFloppy_Main(void)
 			DlgDisk_BrowseDisk(dlgname[0], 0, FLOPPYDLG_DISKA);
 
 			if (strlen(szDiskFileName[0]) > 0){
-
+#ifdef LIBRETRO_FSUAE
+			  amiga_floppy_set_file(0, szDiskFileName[0]);
+#else /*LIBRETRO_FSUAE*/
 					if (currprefs.nr_floppies-1 < 0 ) {
 						currprefs.nr_floppies = 0  + 1;
 					}
@@ -571,7 +573,7 @@ void DlgFloppy_Main(void)
 					DISK_check_change();	
 					//disk_eject(0);
 					//disk_insert (0, changed_prefs.floppyslots[0 ].df, false);
-
+#endif /*LIBRETRO_FSUAE*/
 			}
 
 			break;
@@ -588,8 +590,11 @@ void DlgFloppy_Main(void)
 			break;
 		case FLOPPYDLG_BROWSEB:                         /* Choose a new disk B: */
 			DlgDisk_BrowseDisk(dlgname[1], 1, FLOPPYDLG_DISKB);
-			if (strlen(szDiskFileName[1]) > 0){
 
+			if (strlen(szDiskFileName[1]) > 0){
+#ifdef LIBRETRO_FSUAE
+			  amiga_floppy_set_file(0, szDiskFileName[1]);
+#else /*LIBRETRO_FSUAE*/
 					if (currprefs.nr_floppies-1 < 1 ) {
 						currprefs.nr_floppies = 1  + 1;
 					}
@@ -601,6 +606,7 @@ void DlgFloppy_Main(void)
 					}
 					strcpy (changed_prefs.floppyslots[1 ].df,szDiskFileName[1]);
 					DISK_check_change();
+#endif /*LIBRETRO_FSUAE*/
 			}
 
 
@@ -618,7 +624,9 @@ void DlgFloppy_Main(void)
 			DlgDisk_BrowseDisk(dlgname[2], 0, FLOPPYDLG_DISK2);
 
 			if (strlen(szDiskFileName[2]) > 0){
-
+#ifdef LIBRETRO_FSUAE
+			  amiga_floppy_set_file(0, szDiskFileName[2]);
+#else /*LIBRETRO_FSUAE*/
 					if (currprefs.nr_floppies-1 < 2 ) {
 						currprefs.nr_floppies = 2  + 1;
 					}
@@ -633,7 +641,7 @@ void DlgFloppy_Main(void)
 					DISK_check_change();	
 					//disk_eject(0);
 					//disk_insert (0, changed_prefs.floppyslots[0 ].df, false);
-
+#endif /*LIBRETRO_FSUAE*/
 			}
 
 			break;
@@ -650,8 +658,11 @@ void DlgFloppy_Main(void)
 			break;
 		case FLOPPYDLG_BROWSE3:                         /* Choose a new disk B: */
 			DlgDisk_BrowseDisk(dlgname[3], 1, FLOPPYDLG_DISKB);
-			if (strlen(szDiskFileName[3]) > 0){
 
+			if (strlen(szDiskFileName[3]) > 0){
+#ifdef LIBRETRO_FSUAE
+			  amiga_floppy_set_file(0, szDiskFileName[3]);
+#else /*LIBRETRO_FSUAE*/
 					if (currprefs.nr_floppies-1 < 3 ) {
 						currprefs.nr_floppies = 3  + 1;
 					}
@@ -663,6 +674,7 @@ void DlgFloppy_Main(void)
 					}
 					strcpy (changed_prefs.floppyslots[3 ].df,szDiskFileName[3]);
 					DISK_check_change();
+#endif /*LIBRETRO_FSUAE*/
 			}
 
 			break;
