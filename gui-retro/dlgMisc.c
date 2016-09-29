@@ -195,6 +195,7 @@ void Dialog_MiscDlg(void)
 	else if(miscdlg[DLGMISC_SPEED200].state & SG_SELECTED)changed_prefs.floppy_speed=200;
 	else if(miscdlg[DLGMISC_SPEED400].state & SG_SELECTED)changed_prefs.floppy_speed=400;
 	else if(miscdlg[DLGMISC_SPEED800].state & SG_SELECTED)changed_prefs.floppy_speed=800;
+#ifndef LIBRETRO_FSUAE
 	DISK_check_change();
-
+#endif /*LIBRETRO_FSUAE*/
 }
