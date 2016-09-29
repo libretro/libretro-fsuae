@@ -31,8 +31,8 @@ typedef struct{
 #include "sdlgui.h"
 
 #define SDL_Delay GetTicks2
-#define TEXTURE_WIDTH retrow
-#define TEXTURE_HEIGHT retroh
+#define TEXTURE_WIDTH retrocw
+#define TEXTURE_HEIGHT retroch
 
 unsigned short int bmp[1024*1024];
 

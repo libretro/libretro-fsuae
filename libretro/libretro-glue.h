@@ -27,8 +27,20 @@ extern int retrox;
 extern int retroy;
 extern int retrop;
 extern int retroo;
+extern int retrocw;
+extern int retroch;
 extern int CROP_WIDTH;
 extern int CROP_HEIGHT;
+
+inline static void retrosetpixel(void *buf, int x, int y, int c) {
+  if (x>=retrox && y>=retroy && x<retrocw && y<retroch) {
+    void *p=(char *)buf + (x-retrox)*retrop + (y-retroy)*retroo;
+    switch (retrop) {
+    case 2: *(short *)p =c; break;
+    case 4: *(int *)p =c; break;
+    }
+  }
+}
 
 #define NPLGN 10
 #define NLIGN 5

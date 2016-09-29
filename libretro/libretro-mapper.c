@@ -588,12 +588,12 @@ int input_gui(void)
    gmy+=mouse_y;
    if(gmx<0)
       gmx=0;
-   if(gmx>retrow-1)
-      gmx=retrow-1;
+   if(gmx>retrocw-1)
+      gmx=retrocw-1;
    if(gmy<0)
       gmy=0;
-   if(gmy>retroh-1)
-      gmy=retroh-1;
+   if(gmy>retroch-1)
+      gmy=retroch-1;
 
    return ret;
 }

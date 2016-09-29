@@ -31,11 +31,10 @@ void printch(unsigned short *buffer,int x, int y, unsigned  short color,unsigned
             else
                recty = y+(i<<0);
 
-            buffer[recty* retrow  + rectx] = color; 
+	    retrosetpixel(buffer, rectx, recty, color);
 
             if(pl==1)
-               buffer[(recty+1)* retrow  + rectx] = color; 				
-
+	      retrosetpixel(buffer, rectx, recty+1, color);
          }
       }
    }
@@ -123,22 +122,18 @@ void textCpixel(unsigned  short *buffer,int x,int x2,int y,unsigned  short  colo
 
 void DrawPointBmp(unsigned  short  *buffer,int x,int y,unsigned  short color)
 {
-   int idx;
-
-   idx = x + y * retrow;
-   buffer[idx]=color;	
+   retrosetpixel(buffer, x, y, color);
 }
 
 void DrawFBoxBmp(unsigned  short  *buffer,int x,int y,int dx,int dy,unsigned  short color)
 {
-   int i,j,idx;
+   int i,j;
 
    for(i=x;i<x+dx;i++)
    {
       for(j=y;j<y+dy;j++)
       {
-         idx= i + j * retrow;
-         buffer[idx]=color;	
+	 retrosetpixel(buffer, i, j, color);
       }
    }
 
@@ -146,22 +141,18 @@ void DrawFBoxBmp(unsigned  short  *buffer,int x,int y,int dx,int dy,unsigned  sh
 
 void DrawBoxBmp(unsigned  short  *buffer,int x,int y,int dx,int dy,unsigned  short  color)
 {
-   int i,j,idx;
+   int i,j;
 
    for(i=x;i<x+dx;i++)
    {
-      idx=i+y*retrow;
-      buffer[idx]=color;
-      idx=i+(y+dy)*retrow;
-      buffer[idx]=color;
+      retrosetpixel(buffer, i, y, color);
+      retrosetpixel(buffer, i, y+dy, color);
    }
 
    for(j=y;j<y+dy;j++)
    {
-      idx=x+j*retrow;
-      buffer[idx]=color;	
-      idx=(x+dx)+j*retrow;
-      buffer[idx]=color;	
+      retrosetpixel(buffer, x, j, color);
+      retrosetpixel(buffer, x+dx, j, color);
    }
 
 }
@@ -169,33 +160,31 @@ void DrawBoxBmp(unsigned  short  *buffer,int x,int y,int dx,int dy,unsigned  sho
 
 void DrawHlineBmp(unsigned  short  *buffer,int x,int y,int dx,int dy,unsigned  short  color)
 {
-   int i,j,idx;
+   int i,j;
 
    (void)j;
 
    for(i=x;i<x+dx;i++)
    {
-      idx=i+y*retrow;
-      buffer[idx]=color;		
+      retrosetpixel(buffer, i, y, color);
    }
 }
 
 void DrawVlineBmp(unsigned  short *buffer,int x,int y,int dx,int dy,unsigned  short  color)
 {
-   int i,j,idx;
+   int i,j;
 
    (void)i;
 
    for(j=y;j<y+dy;j++)
    {
-      idx=x+j*retrow;
-      buffer[idx]=color;		
+      retrosetpixel(buffer, x, j, color);
    }	
 }
 
 void DrawlineBmp(unsigned  short  *buffer,int x1,int y1,int x2,int y2,unsigned  short  color)
 {
-   int pixx, pixy, x, y, dx, dy, sx, sy, swaptmp, idx;
+  int pixx, pixy, x, y, dx, dy, sx, sy, swaptmp, idx;
 
    dx = x2 - x1;
    dy = y2 - y1;
@@ -216,8 +205,7 @@ void DrawlineBmp(unsigned  short  *buffer,int x1,int y1,int x2,int y2,unsigned  
       }
       else
       {
-         idx=x1+y1*retrow;
-         buffer[idx]=color;
+	 retrosetpixel(buffer, x1, y1, color);
          return ;
       }
    }
@@ -263,6 +251,7 @@ void DrawlineBmp(unsigned  short  *buffer,int x1,int y1,int x2,int y2,unsigned  
    for (; x < dx; x++, idx +=pixx)
    {
       buffer[idx]=color;
+      //retrosetpixel(buffer, x1, y1, color);
       y += dy;
       if (y >= dx)
       {
@@ -311,7 +300,7 @@ void DrawCircle(unsigned short *buf,int x, int y, int radius,unsigned short rgba
       if (full)
          DrawlineBmp(buf,x,y, x1,y1,rgba); 
       else
-         buf[x1+y1*retrow]=rgba;
+	 retrosetpixel(buf, x1, y1, rgba);
    }
 
 }
@@ -370,7 +359,7 @@ void Draw_string(unsigned short *surf, signed short int x, signed short int y, c
    int surfw=strlen * 7 * xscale;
    int surfh=8 * yscale;
 
-   linesurf =(unsigned char*)malloc(sizeof(unsigned short)*surfw*surfh );
+   linesurf =(unsigned char*)malloc(sizeof(short)*surfw*surfh);
 
    yptr = (unsigned short *)&linesurf[0];
 
@@ -398,7 +387,7 @@ void Draw_string(unsigned short *surf, signed short int x, signed short int y, c
 
    for(yrepeat = y; yrepeat < y+ surfh; yrepeat++) 
       for(xrepeat = x; xrepeat< x+surfw; xrepeat++,yptr++)
-         if(*yptr!=0)surf[xrepeat+yrepeat*retrow] = *yptr;
+         if(*yptr!=0) retrosetpixel(surf, xrepeat, yrepeat, *yptr);
 
    free(linesurf);
 }
