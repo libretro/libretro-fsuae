@@ -107,6 +107,12 @@ int p96hsync_counter, full_refresh;
 #if defined(X86_MSVC_ASSEMBLY)
 #define SWAPSPEEDUP
 #endif
+#ifdef __LIBRETRO__
+# undef DEBUG
+# ifdef DEBUG_PICASSO96
+#  define DEBUG
+# endif /*DEBUG_PICASSO96*/
+#endif /*__LIBRETRO__*/
 #ifdef PICASSO96
 #ifdef DEBUG // Change this to _DEBUG for debugging
 #define P96TRACING_ENABLED 1
@@ -716,6 +722,10 @@ static bool rtg_render (void)
 #endif
 	bool flushed = false;
 	bool uaegfx = currprefs.rtgmem_type < GFXBOARD_HARDWARE;
+
+#ifdef __LIBRETRO__
+	flush_screen (NULL, 0, 0);
+#endif /**/
 
 	if (doskip () && p96skipmode == 0) {
 		;
