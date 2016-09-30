@@ -37,7 +37,7 @@ inline static void retrosetpixel(void *buf, int x, int y, int c) {
     void *p=(char *)buf + (x-retrox)*retrop + (y-retroy)*retroo;
     switch (retrop) {
     case 2: *(short *)p =c; break;
-    case 4: *(int *)p =c; break;
+    case 4: *(int *)p =(((c>>(5+6)) & 0x1f) <<(16+3)) | (((c>>(6)) & 0x1f) <<(8+3)) | (((c>>(0)) & 0x3f) <<(0+2)); break;
     }
   }
 }
