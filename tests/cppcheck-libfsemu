@@ -1,2 +1,0 @@
-#!/bin/sh -e
-cppcheck --quiet --force --error-exitcode=1 libfsemu

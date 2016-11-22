@@ -1,3 +1,0 @@
-#!/bin/sh -e
-exit 77
-cppcheck --quiet --force --error-exitcode=1 src/*.cpp
