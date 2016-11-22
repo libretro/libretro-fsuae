@@ -2,25 +2,25 @@
 
 
 
-Based on FS-UAE 2.7.15dev (https://fs-uae.net/)
+Based on FS-UAE 2.8.1u5 (https://fs-uae.net/)
 
-First 'Testable' release:
+'Beta' release:
 * The input layer is the same as libretro-uae (README-libretro-puae):
   * Gamepad compatible (to be fixed).
   * AltL+F11: GUI screen (need to be fixed).
   * F11:      Grab mouse (default retroarch key)
   * RET: virtual keyboard.
 * Audio OK now.
+* Mouse + Jostick setup as default emulation inputs.
 
 Misc Issues:
-* The joystick must be fixed.
 * Static Makefile (Will target mainly Linux x86_64/i686/arm)
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Test
 * The kickstart must be located here: (Retro_Save_Directory)/fsuae/Kickstarts
 * Using USE_FSUAEDIRS=1 at the make level, the software will use the same directories/configurations as the regular FS-UAE (kickstart: ~/FS-UAE/Kickstarts)
-* This software handle the 'fs-uae' configuration files
+* This software processes the 'fs-uae' configuration files
 * Your ADF file: /storage/df0.adf
 
 ```bash
@@ -62,16 +62,22 @@ make clean
 make -j 4
 ```
 
-The following parameters are likely required on many board to get real-time operation: accuracy = 0, or accuracy = -1.
+ARM: The following parameter is likely required to get real-time operation: accuracy = 0, or accuracy = -1.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#A4000 / A3000 Emulation
+#A4000 / A3000 Emulation / Regular Installation
 The file: 'fs-uae.dat' is required, and must be located, on one of the following directory (the base is the 'retroarch' executable directory): base/fs-uae.dat, base/../share/fs-uae/fs-uae.dat or base/../../Data/fs-uae.dat
+
+e.g.:
+```bash
+install -o root -g bin -m 0644 fsuae_libretro.so "${prefix}/libexec/libretro/x86_64-pc-linux-gnu/fsuae_libretro.so"
+install -o root -g bin -m 0644 "fs-uae.dat" "${prefix}/share/fs-uae/fs-uae.dat"
+```
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #JIT
 
-Working today only when using the 'i686' architecture.
+Operational on the 'x86_64' and 'i686' architecture.
 
 ```bash
 cat >a4000.fs-uae <<EOF
@@ -94,8 +100,6 @@ EOF
 ```bash
 export LD_PREFER_MAP_32BIT_EXEC=1
 ```
-
-This command is not enough, some ELF data segments must be located in the 32bits range too. This last issue is open.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Graphic Resolution / Crop
