@@ -2,7 +2,7 @@
 # s_prg="fs-uae-2.7.14dev"; ./rebase-fromoriginal-fs-uae-2.7.14dev tar "${s_prg}.tar.xz" "${s_prg}"
 #                           ./rebase-fromoriginal-fs-uae-2.7.14dev git fs-uae-dir fs-uae-dirbase
 #--------------------------------------------------------
-#s_mv="git mv";s_out=".";s_maindir=".";
+#s_mv="git mv";s_out=".";s_maindir="."; # s_out="$(pwd)";
 #--------------------------------------------------------
 s_mode="$1"
 s_fsdevar="$2";
@@ -27,7 +27,7 @@ fi
 # c++ back to c (no true object programmation here)
 for f in $(find "${s_out}/" -name "*.cpp");do ${s_mv} "$f" $(dirname "$f")/$(basename "$f" .cpp).c;done
 for f in $(find "${s_out}/" -name "*.cc");do ${s_mv} "$f" $(dirname "$f")/$(basename "$f" .cc).c;done
-find "${s_out}/" -type f | xargs sed -r -i "s/\r//"
+find "${s_out}/" -type f -a \! \( -regex ".*/[.]git/.*" \) | xargs sed -r -i "s/\r//"
 
 #-
 find "${s_out}/" -type f \( -name "*.c" -o -name "*.h" \) |\
