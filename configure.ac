@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([FS-UAE], [2.8.1u5],
+AC_INIT([FS-UAE], [2.9.1dev],
         [frode@fs-uae.net], [fs-uae], [http://fs-uae.net])
 AC_CONFIG_AUX_DIR([.])
 AC_CANONICAL_HOST
@@ -22,7 +22,7 @@ AM_INIT_AUTOMAKE([tar-ustar subdir-objects])
 
 AC_SUBST([PACKAGE_SERIES], [devel])
 
-AC_DEFINE_UNQUOTED([UAE_BASE_VERSION], ["WinUAE 3220"],
+AC_DEFINE_UNQUOTED([UAE_BASE_VERSION], ["WinUAE 3300b2"],
 [Which UAE core this version is based on.])
 
 PACKAGE_MAJOR=`echo ${PACKAGE_VERSION} | sed -e 's,\(\.*\)\..*\..*,\1,g'`
@@ -48,8 +48,14 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AM_PROG_CC_C_O
 # AC_PATH_TOOL(OBJCOPY, objcopy)
-AC_PATH_PROG([MSGFMT], [msgfmt])
-AC_PATH_PROG([ZIP], [zip])
+AC_PATH_PROG([MSGFMT], [msgfmt], [not found])
+if test "$MSGFMT" = "not found"; then
+  AC_MSG_ERROR([msgfmt not found on path])
+fi
+AC_PATH_PROG([ZIP], [zip], [not found])
+if test "$ZIP" = "not found"; then
+  AC_MSG_ERROR([zip not found on path])
+fi
 PKG_PROG_PKG_CONFIG
 
 
@@ -297,13 +303,10 @@ AS_CASE([$host_os],
     LOADABLE_MODULE_EXT=".so"
 ],
 [darwin*], [
-    OS_NAME="macosx"
-    OS_NAME_2="Mac OS X"
-    OS_NAME_3="OSX"
-    # OS_NAME="macos"
-    # OS_NAME_2="MacOS"
-    # OS_NAME_3="MacOS"
-    OS_CPPFLAGS="-DMACOSX"
+    OS_NAME="macos"
+    OS_NAME_2="macOS"
+    OS_NAME_3="macOS"
+    OS_CPPFLAGS="-DMACOSX -DMACOS"
     LOADABLE_MODULE_EXT=".so"
     OS_LDFLAGS="-headerpad_max_install_names -pagezero_size 0x2000 -rpath @executable_path/../Frameworks"
 ],
@@ -627,7 +630,7 @@ AS_IF([test "x$enable_jit" != xno], [
     ], [
         if test "x$enable_jit" != xyes; then
             AC_MSG_FAILURE(
-                [--enable-jit was given, but arch is not supported])
+                [JIT is not supported on $host])
         fi
 	AC_SUBST(USE_JIT, 0)
     ])

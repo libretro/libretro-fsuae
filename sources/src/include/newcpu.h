@@ -80,6 +80,7 @@ struct cputbl {
 };
 
 #ifdef JIT
+#define MAX_JIT_CACHE 16384
 typedef uae_u32 REGPARAM3 compop_func (uae_u32) REGPARAM;
 
 #define COMP_OPCODE_ISJUMP      0x0001
@@ -94,6 +95,8 @@ struct comptbl {
 	uae_u32 opcode;
 	int specific;
 };
+#else
+#define MAX_JIT_CACHE 0
 #endif
 
 extern uae_u32 REGPARAM3 op_illg (uae_u32) REGPARAM;

@@ -733,7 +733,7 @@ static bool rtg_render (void)
 		if (uaegfx) {
 			flushed = picasso_flushpixels (gfxmem_bank.start + natmem_offset, picasso96_state.XYOffset - gfxmem_bank.start);
 		} else {
-			gfxboard_vsync_handler ();
+			flushed = gfxboard_vsync_handler ();
 #if 1 //def FSUAE
 #ifdef DEBUG_SHOW_SCREEN
 			printf("flushed = true\n");
@@ -741,6 +741,8 @@ static bool rtg_render (void)
 			// FIXME: hack to avoid double rendering due to
 			// both rtg_render and rtg_show directly or
 			// indirectly calling gfx_unlock_picasso (true)
+			// FIXME: Is this now still needed after gfxboard_vsync_handler
+			// returns flushed?
 			flushed = true;
 #endif
 		}

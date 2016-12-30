@@ -269,4 +269,9 @@ void setup_brkhandler (void)
 #endif
     */
 }
+
+void sleep_cpu_wakeup(void)
+{
+    UAE_LOG_STUB_MAX(10, "");
+}
 #endif
