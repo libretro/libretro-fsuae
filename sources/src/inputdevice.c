@@ -4705,7 +4705,7 @@ static int switchdevice (struct uae_input_device *id, int num, bool buttonmode)
 #if 1
 			write_log (_T("inputdevice gameports change '%s':%d->%d %d,%d\n"), name, num, newport, currprefs.input_selected_setting, currprefs.jports[newport].id);
 #endif
-			inputdevice_unacquire ();
+			inputdevice_unacquire0 ();
 			if (fname) {
 				if (newslot >= 0) {
 					statusline_add_message(_T("Port %d: Custom %d"), newport, newslot + 1);

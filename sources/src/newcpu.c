@@ -4344,13 +4344,15 @@ void cpu_semaphore_get(void)
 {
 	if (!currprefs.cpu_thread)
 		return;
-	DWORD tid = GetCurrentThreadId();
 
+#ifdef _WIN32
+	DWORD tid = GetCurrentThreadId();
 	if (tid == m68k_cs_owner) {
 		m68k_spinlock_cnt++;
 		return;
 	}
-
+#endif
+	
 #ifdef _WIN32
 	_InterlockedIncrement(&m68k_spinlock_waiting);
 	EnterCriticalSection(&m68k_cs1);
@@ -4394,7 +4396,9 @@ static void run_cpu_thread(void *(*f)(void *))
 #if SPINLOCK_DEBUG
 	m68k_spinlock_cnt = 0;
 #endif
+#ifdef _WIN32
 	m68k_cs_initialized = true;
+#endif
 	if (uae_start_thread(_T("cpu"), f, NULL, NULL)) {
 		while (!cpu_thread_active) {
 			sleep_millis(1);
