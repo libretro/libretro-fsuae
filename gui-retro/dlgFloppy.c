@@ -407,7 +407,7 @@ static int media_menu_function() {
 
     if (type == 0) { // floppy
       char *str;
-      //fprintf(stderr, "%s:%d for df%d\n", __FUNCTION__, __LINE__, drive);
+      //fprintf(stderr, "%s:%d for df%d\n", __func__, __LINE__, drive);
 
       for (int i = -1; i < AMIGA_FLOPPY_LIST_SIZE && floppyswapnum < FLOPPY_SWAPMAX; i++) {
 	if (i == -1) {
@@ -429,7 +429,7 @@ static int media_menu_function() {
 	      }
 	      else
 		sprintf(buf, "%d:%s", index, (n<14 ? nam:&nam[n-14]));
-	      //fprintf(stderr, "%s:%d index=%d,i=%d <%s> -> <%s>\n", __FUNCTION__, __LINE__, index, i, str, buf);
+	      //fprintf(stderr, "%s:%d index=%d,i=%d <%s> -> <%s>\n", __func__, __LINE__, index, i, str, buf);
 	      floppyswap[floppyswapnum].x = index;
 	      floppyswap[floppyswapnum].y = i;
 
@@ -465,7 +465,7 @@ static int media_menu_function() {
       }
     }
     else {
-      //fprintf(stderr, "%s: type=%d not supported...\n", __FUNCTION__, type);
+      //fprintf(stderr, "%s: type=%d not supported...\n", __func__, type);
     }
   }
 
@@ -700,8 +700,8 @@ void DlgFloppy_Main(void)
 		    int i=but-FLOPPYDLG_SWAP;
 		    if (i<floppyswapnum) {
 		      insert_disk(floppyswap[i].x, floppyswap[i].y);
-		    } else fprintf(stderr, "%s %s:%d i=%d\n", __FILE__, __FUNCTION__, __LINE__, i);
-		  } /*else fprintf(stderr, "%s %s:%d but=%d\n", __FILE__, __FUNCTION__, __LINE__, but);*/
+		    } else fprintf(stderr, "%s %s:%d i=%d\n", __FILE__, __func__, __LINE__, i);
+		  } /*else fprintf(stderr, "%s %s:%d but=%d\n", __FILE__, __func__, __LINE__, but);*/
 		}
                 gui_poll_events();
 	}
