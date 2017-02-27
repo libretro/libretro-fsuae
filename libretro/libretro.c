@@ -642,7 +642,7 @@ void retro_run(void) {
   bool updated = false;
 
 #ifdef DEBUG_RETRORUN
-  fprintf(stderr, "%s %d %s --------------------\n", __FILE__, __LINE__, __FUNCTION__);
+  fprintf(stderr, "%s %d %s --------------------\n", __FILE__, __LINE__, __func__);
 #endif /*DEBUG*/
    
   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
@@ -659,11 +659,11 @@ void retro_run(void) {
  sortie:
   video_cb(((char *)bmp) + (retroo * retroy) + (retrop * retrox), retrocw, retroch, retroo);
 #ifdef DEBUG_RETRORUN
-  fprintf(stderr, "%s %d %s -------------------- (%d,%d,%d,%d)\n", __FILE__, __LINE__, __FUNCTION__, retrox, retroy, retrow, retroh);
+  fprintf(stderr, "%s %d %s -------------------- (%d,%d,%d,%d)\n", __FILE__, __LINE__, __func__, retrox, retroy, retrow, retroh);
 #endif /*DEBUG*/
   co_switch(emuThread);
 #ifdef DEBUG_RETRORUN
-  fprintf(stderr, "%s %d %s --------------------\n", __FILE__, __LINE__, __FUNCTION__);
+  fprintf(stderr, "%s %d %s --------------------\n", __FILE__, __LINE__, __func__);
 #endif /*DEBUG*/
 }
 

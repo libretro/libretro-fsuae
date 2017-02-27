@@ -250,7 +250,7 @@ void ScreenUpdate () {
 
 void flush_screen (/*struct vidbuf_description *gfxinfo,*/ struct vidbuffer *vb, int first_line, int end_line) {
 #ifdef DEBUG
-  //fprintf(stderr, "%s %d %s -------------------- %d\n", __FILE__, __LINE__, __FUNCTION__, pauseg);
+  //fprintf(stderr, "%s %d %s -------------------- %d\n", __FILE__, __LINE__, __func__, pauseg);
 #endif /*DEBUG*/
   g_has_flushed_screen = 1;
   if(pauseg == 1)
@@ -395,7 +395,7 @@ int graphics_init(bool b) {
 #endif
 	
 #ifdef DEBUG
-  fprintf(stderr, "%s %d %s --\n", __FILE__, __LINE__, __FUNCTION__);
+  fprintf(stderr, "%s %d %s --\n", __FILE__, __LINE__, __func__);
   fprintf(stderr, "graphics init  pixbuf=%p color_mode=%d wh=%dx%d (%p) bpp=%d (%d)\n", pixbuf, currprefs.color_mode, retrow, retroh,&bmp[0], g_amiga_video_bpp, retroo);
 #endif /*DEBUG*/
   if (pixbuf == NULL) {
@@ -443,7 +443,7 @@ int graphics_init(bool b) {
 
 
 #ifdef DEBUG
-  fprintf(stderr, "%s %d %s -- calling reset_drawing\n", __FILE__, __LINE__, __FUNCTION__);
+  fprintf(stderr, "%s %d %s -- calling reset_drawing\n", __FILE__, __LINE__, __func__);
 #endif /*DEBUG*/
   reset_drawing ();
   init_colors ();
@@ -816,7 +816,7 @@ void uae_resume (void) {
 
 bool target_graphics_buffer_update (void) {
 #ifdef DEBUG
-  fprintf(stderr, "%s %d %s -- target_graphics_buffer_update - clearing buffer\n", __FILE__, __LINE__, __FUNCTION__);
+  fprintf(stderr, "%s %d %s -- target_graphics_buffer_update - clearing buffer\n", __FILE__, __LINE__, __func__);
 #endif /*DEBUG*/
   memset(bmp, 0x00, retroh * retroo);
   memset(g_renderdata.line, 0, AMIGA_MAX_LINES);
@@ -1031,7 +1031,7 @@ static bool render_frame(bool immediate)
         g_renderdata.refresh_rate = currprefs.chipset_refreshrate;
     }
 #ifdef DEBUG
-    //fprintf(stderr, "%s %d %s -- %0.2f\n", __FILE__, __LINE__, __FUNCTION__, g_renderdata.refresh_rate);
+    //fprintf(stderr, "%s %d %s -- %0.2f\n", __FILE__, __LINE__, __func__, g_renderdata.refresh_rate);
 #endif /*DEBUG*/
     if (g_libamiga_callbacks.render) {
         g_libamiga_callbacks.render(&g_renderdata);
@@ -1067,7 +1067,7 @@ bool render_screen(bool immediate)
 #ifdef DEBUG
     {
       static int t_c = 0;
-      if ( ((t_c++) % 50) == 0 ) fprintf(stderr, "%s %d %s -- p=%d outb=%p r=%f\n", __FILE__, __LINE__, __FUNCTION__, g_picasso_enabled, gfxvidinfo.outbuffer, g_renderdata.refresh_rate);
+      if ( ((t_c++) % 50) == 0 ) fprintf(stderr, "%s %d %s -- p=%d outb=%p r=%f\n", __FILE__, __LINE__, __func__, g_picasso_enabled, gfxvidinfo.outbuffer, g_renderdata.refresh_rate);
     }
 #endif /*DEBUG*/
 
@@ -1416,7 +1416,7 @@ static void grow_render_buffer(int width, int height)
   // unsigned char *new_pixels = (unsigned char*) g_renderdata.grow(width, height);
 
 #ifdef DEBUG
-    fprintf(stderr, "%s %d %s -- %dx%d\n", __FILE__, __LINE__, __FUNCTION__, width, height);
+    fprintf(stderr, "%s %d %s -- %dx%d\n", __FILE__, __LINE__, __func__, width, height);
 #endif /*DEBUG*/
     if(width>0 && width<=EMULATOR_MAX_WIDTH && height>0 && height<EMULATOR_MAX_HEIGHT) {
       //retrow = width;
@@ -1437,7 +1437,7 @@ static void grow_render_buffer(int width, int height)
 void amiga_set_render_buffer(void *data, int size, int need_redraw, void *(*grow)(int width, int height))
 {
 #ifdef DEBUG
-    fprintf(stderr, "%s %d %s -- %p -- %d %d\n", __FILE__, __LINE__, __FUNCTION__, data, size, need_redraw);
+    fprintf(stderr, "%s %d %s -- %p -- %d %d\n", __FILE__, __LINE__, __func__, data, size, need_redraw);
 #endif /*DEBUG*/
     g_renderdata.grow = grow;
     g_renderdata.pixels = (unsigned char *) data;
