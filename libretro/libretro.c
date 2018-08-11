@@ -19,6 +19,7 @@
 #include "fs/data.h"
 #include "fs/emu/path.h"
 #include "fs-uae/paths.h"
+#include "sources/src/include/uae_types.h"
 
 cothread_t mainThread;
 cothread_t emuThread;
@@ -43,6 +44,8 @@ static int firstps = 0;
 static enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
 
 
+extern uae_u8 *natmem_offset;
+extern uae_u32 natmem_size;
 extern unsigned short int  bmp[EMULATOR_MAX_WIDTH*EMULATOR_MAX_HEIGHT];
 extern unsigned short int  savebmp[EMULATOR_MAX_WIDTH*EMULATOR_MAX_HEIGHT];
 extern int pauseg;
@@ -794,13 +797,15 @@ bool retro_unserialize(const void *data_, size_t size)
 
 void *retro_get_memory_data(unsigned id)
 {
-   (void)id;
+   if ( id == RETRO_MEMORY_SYSTEM_RAM )
+      return natmem_offset;
    return NULL;
 }
 
 size_t retro_get_memory_size(unsigned id)
 {
-   (void)id;
+   if ( id == RETRO_MEMORY_SYSTEM_RAM )
+      return natmem_size;
    return 0;
 }
 
