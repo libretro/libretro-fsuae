@@ -33,7 +33,7 @@ ifeq ($(platform), unix) ## (linux ARM: --enable-neon available)
    CC = gcc
    TARGET := $(TARGET_NAME)_libretro.so
    fpic := -fPIC
-   LDFLAGS := -lz -lpthread
+   LDFLAGS += -lz -lpthread
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/libretro/link.T
    ifeq ($(USE_JIT), 1)
       ifeq ($(TARGET_ARCH), x86_64) # JIT => address space 32 bits
@@ -52,7 +52,7 @@ else ifeq ($(platform), android-armv7)
    LD = @arm-linux-androideabi-g++ 
    TARGET := $(TARGET_NAME)_libretro_android.so
    fpic := -fPIC
-	LDFLAGS := -lz -lm
+	LDFLAGS += -lz -lm
    SHARED :=  -Wl,--fix-cortex-a8 -shared -Wl,--version-script=$(CORE_DIR)/libretro/link.T -Wl,--no-undefined
    PLATFLAGS += -DANDROID -DRETRO -DAND -DLSB_FIRST -DALIGN_DWORD -DANDPORT -DA_ZIP
 else ifeq ($(platform), android)
@@ -61,7 +61,7 @@ else ifeq ($(platform), android)
    LD = @arm-linux-androideabi-g++ 
    TARGET := $(TARGET_NAME)_libretro_android.so
    fpic := -fPIC
-	LDFLAGS := -lz
+	LDFLAGS += -lz
    SHARED :=  -Wl,--fix-cortex-a8 -shared -Wl,--version-script=$(CORE_DIR)/libretro/link.T -Wl,--no-undefined
    PLATFLAGS += -DANDROID -DRETRO -DAND -DLSB_FIRST -DALIGN_DWORD -DANDPORT -DARM_OPT_TEST=1
 else ifeq ($(platform), wii)
@@ -72,14 +72,14 @@ else ifeq ($(platform), wii)
    CFLAGS += -DSDL_BYTEORDER=SDL_BIG_ENDIAN -DMSB_FIRST -DBYTE_ORDER=BIG_ENDIAN  -DBYTE_ORDER=BIG_ENDIAN \
 	-DWIIPORT=1 -DHAVE_MEMALIGN -DHAVE_ASPRINTF -I$(ZLIB_DIR) -I$(DEVKITPRO)/libogc/include \
 	-D__powerpc__ -D__POWERPC__ -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -D__ppc__
-   LDFLAGS :=   -lm -lpthread -lc
+   LDFLAGS +=   -lm -lpthread -lc
    PLATFLAGS +=  -DRETRO -DALIGN_DWORD -DWIIPORT
 else ifeq ($(platform), ps3)
    TARGET := $(TARGET_NAME)_libretro_$(platform).a
    CC = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe
    AR = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-ar.exe
    ZLIB_DIR = $(LIBUTILS)/zlib/
-   LDFLAGS :=   -lm -lpthread -lc
+   LDFLAGS +=   -lm -lpthread -lc
    CFLAGS += -DSDL_BYTEORDER=SDL_BIG_ENDIAN -DMSB_FIRST -DBYTE_ORDER=BIG_ENDIAN  -DBYTE_ORDER=BIG_ENDIAN \
 	-D__CELLOS_LV2 -DPS3PORT=1 -DHAVE_MEMALIGN -DHAVE_ASPRINTF -I$(ZLIB_DIR) 
    PLATFLAGS +=  -DRETRO -DALIGN_DWORD 
@@ -96,7 +96,7 @@ endif
    TARGET := $(TARGET_NAME)_libretro.dll
    fpic := -fPIC
    SHARED := -shared -static-libgcc -s -Wl,--version-script=$(CORE_DIR)/libretro/link.T -Wl,--no-undefined 
-	LDFLAGS := -lm -lz
+	LDFLAGS += -lm -lz
 endif
 
 ifeq ($(DEBUG), 1)
