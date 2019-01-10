@@ -280,10 +280,11 @@ int fs_data_file_content(const char *name, char **data, int *size)
     return 0;
 }
 
-int fs_data_init(const char *app_name, const char *dat_name)
+int fs_data_init(const char *app_name, const char *dat_name, const char *misc_name)
 {
     fs_log("fs_data_init %s %s\n", app_name, dat_name);
     char exe_path[PATH_MAX + 1];
+    int error;
     int result = fs_get_application_exe_path(exe_path, PATH_MAX);
     if (result != 1) {
         return 1;
@@ -291,27 +292,54 @@ int fs_data_init(const char *app_name, const char *dat_name)
 
     g_dat_table = g_hash_table_new(g_str_hash, g_str_equal);
 
-    /* Check for embedded dat file */
-    fs_log("checking dat file: %s\n", exe_path);
-    g_dat_file = g_fopen(exe_path, "rb");
-    int error = read_zip_entries(g_dat_file);
-    if (error == 0) {
-        return 0;
+    if (misc_name) {
+        /* Check for embedded dat file */
+        fs_log("checking dat file: %s\n", misc_name);
+	g_dat_file = g_fopen(misc_name, "rb");
+	error = read_zip_entries(g_dat_file);
+	if (error == 0) {
+	  return 0;
+	}
+	fs_log("no dat file: %s\n", misc_name);
+	fclose(g_dat_file);
+    } else {
+        /* Check for embedded dat file */
+        fs_log("checking dat file: %s\n", exe_path);
+	g_dat_file = g_fopen(exe_path, "rb");
+	error = read_zip_entries(g_dat_file);
+	if (error == 0) {
+	  return 0;
+	}
+	fs_log("no dat file: %s\n", exe_path);
+	fclose(g_dat_file);
     }
-    fs_log("no dat file: %s\n", exe_path);
-    fclose(g_dat_file);
     g_dat_file = NULL;
 
-    result = fs_get_application_exe_dir(exe_path, PATH_MAX);
-    if (result != 1) {
-        return 1;
+#ifdef LIBRETRO_FSUAE
+    if (misc_name) {
+        char *path = g_path_get_dirname(misc_name);
+	char *resourcepath = g_build_filename(path, "/resources", NULL);
+	g_free(path);
+	char *dat_path = g_build_filename(resourcepath, dat_name, NULL);
+	g_free(resourcepath);
+	fs_log("checking dat file: %s\n", dat_path);
+	g_dat_file = g_fopen(dat_path, "rb");
+	g_free(dat_path);
     }
+#endif /*LIBRETRO_FSUAE*/
 
-    /* Check if dat file is placed alongside the executable */
-    char *dat_path = g_build_filename(exe_path, dat_name, NULL);
-    fs_log("checking dat file: %s\n", dat_path);
-    g_dat_file = g_fopen(dat_path, "rb");
-    free(dat_path);
+    if (g_dat_file == NULL) {
+        result = fs_get_application_exe_dir(exe_path, PATH_MAX);
+	if (result != 1) {
+	    return 1;
+	}
+
+	/* Check if dat file is placed alongside the executable */
+	char *dat_path = g_build_filename(exe_path, dat_name, NULL);
+	fs_log("checking dat file: %s\n", dat_path);
+	g_dat_file = g_fopen(dat_path, "rb");
+	free(dat_path);
+    }
 
     if (g_dat_file == NULL) {
         char *dat_path = g_build_filename(

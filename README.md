@@ -66,7 +66,7 @@ ARM: The following parameter is likely required to get real-time operation: accu
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #A4000 / A3000 Emulation / Regular Installation
-The file: 'fs-uae.dat' is required, and must be located, on one of the following directory (the base is the 'retroarch' executable directory): base/fs-uae.dat, base/../share/fs-uae/fs-uae.dat or base/../../Data/fs-uae.dat
+The file: 'fs-uae.dat' is required, and must be located, on one of the following directory (the base is the 'retroarch' executable directory): base/fs-uae.dat, base/../share/fs-uae/fs-uae.dat, base/../../Data/fs-uae.dat or <librarypath>/resources/fs-uae.dat
 
 e.g.:
 ```bash

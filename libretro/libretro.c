@@ -180,6 +180,16 @@ static void update_variables(void)
 
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+static const char *libretrofsuaepath(void)
+{
+    const char *libretro_library = NULL;
+
+    environ_cb(RETRO_ENVIRONMENT_GET_LIBRETRO_PATH, &libretro_library);
+
+    return libretro_library;
+}
+/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 void fs_uae_load_rom_files(const char *path)
 {
     fs_log("fs_uae_load_rom_files %s\n", path);
@@ -394,7 +404,7 @@ static void retro_wrap_emulator(void)
 
    fs_set_argv(sizeof(argv)/sizeof(*argv),argv);
    fs_init();  // sources/src/fs-uae/main.c: main()
-   int error = fs_data_init("fs-uae", "fs-uae.dat");
+   int error = fs_data_init("fs-uae", "fs-uae.dat", libretrofsuaepath());
    if (error) {
      fprintf(stderr, "WARNING: error (%d) loading fs-uae.dat\n", error);
    }

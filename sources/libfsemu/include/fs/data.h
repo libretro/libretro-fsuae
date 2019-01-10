@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-int fs_data_init(const char *app_name, const char *dat_name);
+int fs_data_init(const char *app_name, const char *dat_name, const char *misc_name);
 int fs_data_file_content(const char *name, char **data, int *size);
 
 #ifdef __cplusplus
