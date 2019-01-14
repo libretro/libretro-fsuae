@@ -326,6 +326,15 @@ int fs_data_init(const char *app_name, const char *dat_name, const char *misc_na
 	g_dat_file = g_fopen(dat_path, "rb");
 	g_free(dat_path);
     }
+
+    if (misc_name && g_dat_file == NULL) {
+        char *path = g_path_get_dirname(misc_name);
+	char *dat_path = g_build_filename(path, dat_name, NULL);
+	g_free(path);
+	fs_log("checking dat file: %s\n", dat_path);
+	g_dat_file = g_fopen(dat_path, "rb");
+	g_free(dat_path);
+    }
 #endif /*LIBRETRO_FSUAE*/
 
     if (g_dat_file == NULL) {
