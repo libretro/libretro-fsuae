@@ -318,7 +318,7 @@ int fs_data_init(const char *app_name, const char *dat_name, const char *misc_na
 #ifdef LIBRETRO_FSUAE
     if (misc_name) {
         char *path = g_path_get_dirname(misc_name);
-	char *resourcepath = g_build_filename(path, "/resources", NULL);
+	char *resourcepath = g_build_filename(path, "/system", NULL);
 	g_free(path);
 	char *dat_path = g_build_filename(resourcepath, dat_name, NULL);
 	g_free(resourcepath);
